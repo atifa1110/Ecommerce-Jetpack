@@ -19,8 +19,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCard
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
@@ -61,6 +63,7 @@ import coil.compose.AsyncImage
 import com.example.ecommerceapp.R
 import com.example.ecommerceapp.data.ui.Cart
 import com.example.ecommerceapp.data.ui.ItemTransaction
+import com.example.ecommerceapp.data.ui.Payment
 import com.example.ecommerceapp.data.ui.Product
 import com.example.ecommerceapp.data.ui.Review
 import com.example.ecommerceapp.data.ui.Transaction
@@ -1133,6 +1136,102 @@ fun ReviewListCard(
     }
 
     HorizontalDivider()
+}
+
+@Composable
+fun PaymentListCart(
+    item: Payment.PaymentItem,
+    onItemClick: (payment: Payment.PaymentItem) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(if (item.status == false) Color.LightGray else MaterialTheme.colorScheme.background)
+    ) {
+        Card(
+            modifier = if (item.status == true) {
+                Modifier
+                    .clickable {
+                        onItemClick(item)
+                    }
+                    .fillMaxWidth()
+                    .padding(start = 16.dp)
+            } else
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = if(item.status == false) Color.LightGray else MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, end = 16.dp, bottom = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (item.image.isEmpty()) {
+                            Icon(
+                                imageVector = Icons.Default.AddCard,
+                                contentDescription = "Card",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        } else {
+                            AsyncImage(
+                                modifier = Modifier.size(48.dp, 32.dp),
+                                model = item.image,
+                                contentDescription = "Image Item"
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = (if (item.label.isEmpty() == true) stringResource(id = R.string.choose_payment) else item.label).toString(),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.W500
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                            contentDescription = "Arrow"
+                        )
+                    }
+                }
+            }
+        }
+        HorizontalDivider(modifier = Modifier.padding(start = 16.dp))
+    }
+}
+
+@Preview("Light Mode", device = Devices.PIXEL_3)
+@Composable
+fun PaymentCardPreview(){
+    EcommerceAppTheme {
+        PaymentListCart(
+          item = Payment.PaymentItem(
+              label = "Bank BCA",
+              image = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png",
+              status = true
+          ),
+          onItemClick = {}
+        )
+    }
 }
 
 @Preview("Light Mode", device = Devices.PIXEL_3)

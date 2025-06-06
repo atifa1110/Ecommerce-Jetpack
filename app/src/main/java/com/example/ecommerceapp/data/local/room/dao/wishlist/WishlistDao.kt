@@ -1,11 +1,11 @@
-package com.example.ecommerceapp.data.local.database.dao.wishlist
+package com.example.ecommerceapp.data.local.room.dao.wishlist
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.ecommerceapp.data.local.database.Constants
-import com.example.ecommerceapp.data.local.database.entity.wishlist.WishlistEntity
+import com.example.ecommerceapp.data.local.room.Constants
+import com.example.ecommerceapp.data.local.room.entity.wishlist.WishlistEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -3,7 +3,7 @@ package com.example.ecommerceapp.repository.cart
 import com.example.ecommerceapp.data.domain.CartModel
 import com.example.ecommerceapp.data.domain.mapper.asCartModel
 import com.example.ecommerceapp.data.domain.mapper.listMap
-import com.example.ecommerceapp.data.local.database.entity.cart.CartEntity
+import com.example.ecommerceapp.data.local.room.entity.cart.CartEntity
 import com.example.ecommerceapp.data.local.datasource.CartDatabaseSource
 import com.example.ecommerceapp.data.network.response.EcommerceResponse
 import kotlinx.coroutines.delay

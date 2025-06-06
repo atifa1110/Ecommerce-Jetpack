@@ -1,4 +1,4 @@
-package com.example.ecommerceapp.data.local.database
+package com.example.ecommerceapp.data.local.room
 
 internal object Constants {
     internal object Tables {

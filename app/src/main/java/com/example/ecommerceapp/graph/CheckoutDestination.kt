@@ -1,12 +1,9 @@
 package com.example.ecommerceapp.graph
 
-import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.example.ecommerceapp.data.ui.Payment
 import com.example.ecommerceapp.screen.checkout.CheckoutRoute
-import com.example.ecommerceapp.screen.checkout.CheckoutViewModel
 
 object CheckoutDestination : EcommerceNavigationDestination {
     override val route = "checkout_route"
@@ -15,9 +12,13 @@ object CheckoutDestination : EcommerceNavigationDestination {
 
 fun NavGraphBuilder.checkoutGraph(
     onNavigateToStatus: () -> Unit,
-) = composable(route = CheckoutDestination.route) {
+    onNavigateToPayment : () -> Unit
+) = composable(route = CheckoutDestination.route) { backStackEntry ->
+    val paymentItem = backStackEntry.savedStateHandle.get<Payment.PaymentItem>("payment")
     // ✅ Pass ViewModel to the route
     CheckoutRoute(
         onNavigateToStatus = onNavigateToStatus,
+        onNavigateToPayment = onNavigateToPayment,
+        payment = paymentItem?: Payment.PaymentItem("","",false)
     )
 }

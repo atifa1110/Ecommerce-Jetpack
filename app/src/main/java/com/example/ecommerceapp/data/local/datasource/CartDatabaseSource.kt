@@ -2,7 +2,7 @@ package com.example.ecommerceapp.data.local.datasource
 
 import com.example.ecommerceapp.data.domain.CartModel
 import com.example.ecommerceapp.data.domain.mapper.asCartEntity
-import com.example.ecommerceapp.data.local.database.dao.cart.CartDao
+import com.example.ecommerceapp.data.local.room.dao.cart.CartDao
 import javax.inject.Inject
 
 class CartDatabaseSource @Inject constructor(

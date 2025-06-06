@@ -1,7 +1,7 @@
 package com.example.ecommerceapp.data.domain.mapper
 
 import com.example.ecommerceapp.data.domain.WishlistModel
-import com.example.ecommerceapp.data.local.database.entity.wishlist.WishlistEntity
+import com.example.ecommerceapp.data.local.room.entity.wishlist.WishlistEntity
 
 fun WishlistEntity.asWishlistModel() = WishlistModel(
     productId = productId,

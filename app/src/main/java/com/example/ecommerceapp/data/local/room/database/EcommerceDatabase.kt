@@ -1,11 +1,11 @@
-package com.example.ecommerceapp.data.local.database
+package com.example.ecommerceapp.data.local.room.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.ecommerceapp.data.local.database.dao.cart.CartDao
-import com.example.ecommerceapp.data.local.database.dao.wishlist.WishlistDao
-import com.example.ecommerceapp.data.local.database.entity.cart.CartEntity
-import com.example.ecommerceapp.data.local.database.entity.wishlist.WishlistEntity
+import com.example.ecommerceapp.data.local.room.dao.cart.CartDao
+import com.example.ecommerceapp.data.local.room.dao.wishlist.WishlistDao
+import com.example.ecommerceapp.data.local.room.entity.cart.CartEntity
+import com.example.ecommerceapp.data.local.room.entity.wishlist.WishlistEntity
 
 @Database(
     entities = [

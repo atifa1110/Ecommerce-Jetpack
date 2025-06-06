@@ -2,7 +2,7 @@ package com.example.ecommerceapp.data.local.datasource
 
 import com.example.ecommerceapp.data.domain.WishlistModel
 import com.example.ecommerceapp.data.domain.mapper.asWishlistEntity
-import com.example.ecommerceapp.data.local.database.dao.wishlist.WishlistDao
+import com.example.ecommerceapp.data.local.room.dao.wishlist.WishlistDao
 import javax.inject.Inject
 
 class WishlistDatabaseSource @Inject constructor(

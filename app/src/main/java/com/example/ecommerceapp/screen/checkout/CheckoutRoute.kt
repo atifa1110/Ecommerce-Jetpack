@@ -1,7 +1,6 @@
 package com.example.ecommerceapp.screen.checkout
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,7 +53,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.ecommerceapp.R
@@ -64,13 +62,14 @@ import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.data.ui.Cart
 import com.example.ecommerceapp.data.ui.Payment
 import com.example.ecommerceapp.screen.shared.SharedViewModel
-import com.example.ecommerceapp.screen.status.StatusViewModel
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 import com.example.ecommerceapp.utils.currency
 
 @Composable
 fun CheckoutRoute(
     onNavigateToStatus : () -> Unit,
+    onNavigateToPayment : () -> Unit,
+    payment : Payment.PaymentItem,
     viewModel: CheckoutViewModel = hiltViewModel(),
 ) {
     val sharedViewModel: SharedViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
@@ -78,30 +77,24 @@ fun CheckoutRoute(
     val state by sharedViewModel.uiState.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            sharedViewModel.clearCheckedCarts()
-        }
-    }
-
-    LaunchedEffect(uiState.isSuccess) {
-        Log.d("CheckoutRoute", "LaunchedEffect triggered, isSuccess = ${uiState.isSuccess}")
-        if (uiState.isSuccess) {
-            sharedViewModel.setFulfillment(uiState.fulfillment)
-            Log.d("CheckoutRoute", "Setting fulfillment to StatusViewModel: ${uiState.fulfillment}")
-            //statusViewModel.setFulfillment(uiState.fulfillment)
+    LaunchedEffect(uiState.fulfillmentState.isSuccess) {
+        if (uiState.fulfillmentState.isSuccess) {
+            sharedViewModel.setFulfillment(uiState.fulfillmentState.fulfillment)
             onNavigateToStatus()
         }
     }
 
-
     CheckoutScreen(
         uiState = uiState,
         carts = state.checkedCarts,
+        payment = payment,
         totalPrice = viewModel.calculateTotalPrice(state.checkedCarts),
         snackBarHostState = snackBarHostState,
+        onNavigateToPayment = {
+            onNavigateToPayment()
+        },
         onPaymentTransaction = {
-            viewModel.fulfillmentTransaction(state.checkedCarts)
+            viewModel.fulfillmentTransaction(payment,state.checkedCarts)
         },
         snackBarMessageShown = viewModel::snackBarMessageShown,
         increaseQuantity = sharedViewModel::increaseQuantity,
@@ -113,17 +106,19 @@ fun CheckoutRoute(
 fun CheckoutScreen(
     uiState: CheckoutUiState,
     carts : List<Cart>,
+    payment : Payment.PaymentItem,
     totalPrice : Int,
     snackBarHostState: SnackbarHostState,
     loadingContent: @Composable () -> Unit = {
         LoaderScreen(modifier = Modifier.fillMaxSize().background(Color.Transparent))
     },
+    onNavigateToPayment : () -> Unit,
     onPaymentTransaction :  () -> Unit,
     snackBarMessageShown : () -> Unit,
     increaseQuantity: (String) -> Unit,
     decreaseQuantity: (String) -> Unit,
 ){
-    if(uiState.isLoading) {
+    if(uiState.fulfillmentState.isLoading) {
         loadingContent()
     }else{
         Scaffold(
@@ -170,7 +165,7 @@ fun CheckoutScreen(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
-                            enabled = uiState.paymentItem.label.isNotEmpty()
+                            enabled = uiState.paymentConfigState.paymentItem.label.isNotEmpty()
                         ) {
                             Text(
                                 text = stringResource(id = R.string.pay),
@@ -183,8 +178,9 @@ fun CheckoutScreen(
         ) {
             CheckoutContent(
                 modifier = Modifier.padding(it),
-                paymentItem = uiState.paymentItem,
+                paymentItem = payment,
                 checkoutItem = carts,
+                onNavigateToPayment = onNavigateToPayment,
                 decreaseQuantity = decreaseQuantity,
                 increaseQuantity = increaseQuantity
             )
@@ -204,6 +200,7 @@ fun CheckoutContent(
     modifier: Modifier,
     paymentItem: Payment.PaymentItem,
     checkoutItem: List<Cart>,
+    onNavigateToPayment : () -> Unit,
     increaseQuantity: (String) -> Unit,
     decreaseQuantity: (String) -> Unit,
 ) {
@@ -247,7 +244,7 @@ fun CheckoutContent(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { /* TODO: Handle click */ },
+                    .clickable { onNavigateToPayment() },
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(3.dp),
                 colors = CardDefaults.cardColors(
@@ -335,17 +332,25 @@ fun CheckoutPreview() {
         CheckoutScreen(
             carts = emptyList(),
             uiState = CheckoutUiState(
-                isLoading = false,
-                paymentItem = Payment.PaymentItem(
-                    label = "Bank BCA",
-                    image = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png",
-                    status = false
-                ),
+                paymentConfigState = PaymentConfigState(
+                    isLoading = false,
+                    paymentItem = Payment.PaymentItem(
+                        label = "Bank BCA",
+                        image = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png",
+                        status = false
+                    ),
+                )
             ),
             totalPrice = 25000000,
+            payment = Payment.PaymentItem(
+                label = "Bank BCA",
+                image = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png",
+                status = false
+            ),
             snackBarHostState = snackBarHostState,
             onPaymentTransaction = {},
             snackBarMessageShown = {},
+            onNavigateToPayment = {},
             increaseQuantity = {},
             decreaseQuantity = {}
         )

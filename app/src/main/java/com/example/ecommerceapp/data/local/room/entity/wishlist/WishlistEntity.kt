@@ -1,9 +1,9 @@
-package com.example.ecommerceapp.data.local.database.entity.wishlist
+package com.example.ecommerceapp.data.local.room.entity.wishlist
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.ecommerceapp.data.local.database.Constants
+import com.example.ecommerceapp.data.local.room.Constants
 
 @Entity(tableName = Constants.Tables.WISHLIST)
 data class WishlistEntity(

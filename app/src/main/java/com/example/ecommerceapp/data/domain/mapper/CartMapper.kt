@@ -1,7 +1,7 @@
 package com.example.ecommerceapp.data.domain.mapper
 
 import com.example.ecommerceapp.data.domain.CartModel
-import com.example.ecommerceapp.data.local.database.entity.cart.CartEntity
+import com.example.ecommerceapp.data.local.room.entity.cart.CartEntity
 
 
 fun CartEntity.asCartModel() = CartModel(

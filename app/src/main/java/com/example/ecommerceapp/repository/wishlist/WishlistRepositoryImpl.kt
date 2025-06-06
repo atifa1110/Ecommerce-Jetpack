@@ -1,10 +1,9 @@
 package com.example.ecommerceapp.repository.wishlist
 
 import com.example.ecommerceapp.data.domain.WishlistModel
-import com.example.ecommerceapp.data.domain.mapper.asCartModel
 import com.example.ecommerceapp.data.domain.mapper.asWishlistModel
 import com.example.ecommerceapp.data.domain.mapper.listMap
-import com.example.ecommerceapp.data.local.database.entity.wishlist.WishlistEntity
+import com.example.ecommerceapp.data.local.room.entity.wishlist.WishlistEntity
 import com.example.ecommerceapp.data.local.datasource.WishlistDatabaseSource
 import com.example.ecommerceapp.data.network.response.EcommerceResponse
 import kotlinx.coroutines.delay

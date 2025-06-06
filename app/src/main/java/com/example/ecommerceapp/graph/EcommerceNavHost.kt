@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import kotlin.text.set
 
 @Composable
 fun EcommerceNavHost (
@@ -116,6 +117,20 @@ fun EcommerceNavHost (
             onNavigateToStatus = {
                 navController.navigate(StatusDestination.route)
             },
+            onNavigateToPayment = {
+                navController.navigate(PaymentDestination.route)
+            }
+        )
+
+        paymentGraph (
+            onNavigateToBack = {},
+            onItemClick = { paymentItem ->
+                navController
+                    .previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("payment", paymentItem)
+                navController.popBackStack()
+            }
         )
 
         statusGraph (

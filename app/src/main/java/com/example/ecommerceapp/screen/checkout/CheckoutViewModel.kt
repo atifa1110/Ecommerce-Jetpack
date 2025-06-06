@@ -6,8 +6,10 @@ import com.example.ecommerceapp.data.network.response.EcommerceResponse
 import com.example.ecommerceapp.data.ui.Cart
 import com.example.ecommerceapp.data.ui.Fulfillment
 import com.example.ecommerceapp.data.ui.Payment
+import com.example.ecommerceapp.data.ui.Payment.PaymentItem
 import com.example.ecommerceapp.data.ui.mapper.asFulfillment
 import com.example.ecommerceapp.data.ui.mapper.asItemTransactionModel
+import com.example.ecommerceapp.data.ui.mapper.asPayment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +19,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class CheckoutUiState(
+    val fulfillmentState: FulfillmentState = FulfillmentState(),
+    val paymentConfigState: PaymentConfigState = PaymentConfigState(),
+    val userMessage : String? = null,
+)
+
+data class FulfillmentState(
+    val isLoading : Boolean = false,
+    val isError : Boolean = false,
+    val isSuccess : Boolean = false,
+    val fulfillment: Fulfillment = Fulfillment("",false,"","","",0)
+)
+
+data class PaymentConfigState(
     val isLoading : Boolean = false,
     val isError : Boolean = false,
     val isSuccess : Boolean = false,
@@ -25,22 +40,15 @@ data class CheckoutUiState(
         image = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png",
         status = false
     ),
-    val userMessage : String? = null,
-    val fulfillment: Fulfillment = Fulfillment("",false,"","","",0)
 )
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
-    private val fulfillmentTransactionUseCase: FulfillmentTransactionUseCase
+    private val fulfillmentTransactionUseCase: FulfillmentTransactionUseCase,
 ) : ViewModel(){
 
     private val _uiState = MutableStateFlow(CheckoutUiState())
     val uiState: StateFlow<CheckoutUiState> = _uiState.asStateFlow()
-
-
-    fun setPaymentItem(paymentItem : Payment.PaymentItem){
-        _uiState.update { it.copy(paymentItem = paymentItem) }
-    }
 
     fun snackBarMessageShown(){
         _uiState.update {  it.copy(userMessage = null) }
@@ -50,34 +58,44 @@ class CheckoutViewModel @Inject constructor(
         return carts.sumOf { it.unitPrice * it.quantity }
     }
 
-    fun fulfillmentTransaction(checkedCarts: List<Cart>) = viewModelScope.launch {
-        val label = uiState.value.paymentItem.label
-        val list = checkedCarts.asItemTransactionModel()
-        fulfillmentTransactionUseCase.invoke(label,list).collect {result ->
-            when(result){
+    fun fulfillmentTransaction(payment : PaymentItem,checkedCarts: List<Cart>) = viewModelScope.launch {
+        val items = checkedCarts.asItemTransactionModel()
+        fulfillmentTransactionUseCase(payment.label, items).collect { result ->
+            when (result) {
+                is EcommerceResponse.Loading -> {
+                    _uiState.update {
+                        it.copy(
+                            fulfillmentState = it.fulfillmentState.copy(
+                                isLoading = true,
+                                isSuccess = false,
+                                isError = false
+                            )
+                        )
+                    }
+                }
+
                 is EcommerceResponse.Failure -> {
                     _uiState.update {
                         it.copy(
-                            isLoading = false,
-                            isError = true,
+                            fulfillmentState = it.fulfillmentState.copy(
+                                isLoading = false,
+                                isSuccess = false,
+                                isError = true
+                            ),
                             userMessage = result.error
                         )
                     }
                 }
-                EcommerceResponse.Loading -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = true,
-                            isSuccess = false
-                        )
-                    }
-                }
+
                 is EcommerceResponse.Success -> {
                     _uiState.update {
                         it.copy(
-                            isLoading = false,
-                            isSuccess = true,
-                            fulfillment = result.value.asFulfillment()
+                            fulfillmentState = it.fulfillmentState.copy(
+                                isLoading = false,
+                                isSuccess = true,
+                                isError = false,
+                                fulfillment = result.value.asFulfillment()
+                            )
                         )
                     }
                 }

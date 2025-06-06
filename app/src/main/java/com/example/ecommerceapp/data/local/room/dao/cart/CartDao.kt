@@ -1,12 +1,12 @@
-package com.example.ecommerceapp.data.local.database.dao.cart
+package com.example.ecommerceapp.data.local.room.dao.cart
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.ecommerceapp.data.local.database.Constants
-import com.example.ecommerceapp.data.local.database.entity.cart.CartEntity
+import com.example.ecommerceapp.data.local.room.Constants
+import com.example.ecommerceapp.data.local.room.entity.cart.CartEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

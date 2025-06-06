@@ -2,9 +2,9 @@ package com.example.ecommerceapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.ecommerceapp.data.local.database.EcommerceDatabase
-import com.example.ecommerceapp.data.local.database.dao.cart.CartDao
-import com.example.ecommerceapp.data.local.database.dao.wishlist.WishlistDao
+import com.example.ecommerceapp.data.local.room.database.EcommerceDatabase
+import com.example.ecommerceapp.data.local.room.dao.cart.CartDao
+import com.example.ecommerceapp.data.local.room.dao.wishlist.WishlistDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
