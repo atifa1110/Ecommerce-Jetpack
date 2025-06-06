@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "620396876615",
+    "project_id": "tokophincon-59381",
+    "storage_bucket": "tokophincon-59381.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620396876615:android:512d599723ce3e9cafb262",
+        "android_client_info": {
+          "package_name": "com.example.ecommerce"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwGF3fey2qXoGNhJrMNmRpnoHr2g8HwQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620396876615:android:92cb5bb1249d2b1dafb262",
+        "android_client_info": {
+          "package_name": "com.example.ecommerceapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwGF3fey2qXoGNhJrMNmRpnoHr2g8HwQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

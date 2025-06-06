@@ -1,0 +1,239 @@
+package com.example.ecommerceapp.screen.main
+
+import android.content.res.Configuration
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.ecommerceapp.components.MainTopAppBar
+import com.example.ecommerceapp.components.NavigationBottomBar
+import com.example.ecommerceapp.components.NavigationSideBar
+import com.example.ecommerceapp.graph.BottomNavHost
+import com.example.ecommerceapp.graph.MainLevelDestination
+import com.example.ecommerceapp.screen.shared.SharedViewModel
+import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+
+@Composable
+fun MainRoute(
+    isDarkMode: Boolean,
+    onNavigateToLogin : () -> Unit,
+    onNavigateToDetail: (String) -> Unit,
+    onNavigateToCart:() -> Unit,
+    onNavigateToStatus:() -> Unit,
+    onToggleTheme : (Boolean) -> Unit,
+    viewModel: MainViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getCartSize()
+        viewModel.getWishlistSize()
+    }
+
+    MainScreen(
+        cartSize = uiState.cartSize?:0,
+        favoriteSize = uiState.wishlistSize?:0,
+        notificationSize = 0,
+        userName = uiState.userName,
+        userImage = uiState.userImage,
+        isDarkMode = isDarkMode,
+        onLogoutClick = onNavigateToLogin,
+        onNavigateToDetail =onNavigateToDetail,
+        onNavigateToStatus = onNavigateToStatus,
+        onNavigateToCart = onNavigateToCart,
+        onNavigateToNotification = {},
+        onNavigateToModular = {},
+        onToggleTheme = onToggleTheme,
+        navigationType = NavigationType.BOTTOM_NAV
+    )
+}
+
+@Composable
+fun MainScreen(
+    cartSize: Int,
+    favoriteSize: Int,
+    notificationSize: Int,
+    userName: String,
+    userImage : String,
+    isDarkMode: Boolean,
+    onLogoutClick: () -> Unit,
+    onNavigateToDetail: (String) -> Unit,
+    onNavigateToStatus: () -> Unit,
+    onNavigateToCart: () -> Unit,
+    onNavigateToNotification: () -> Unit,
+    onNavigateToModular: () -> Unit,
+    onToggleTheme : (Boolean) -> Unit,
+    navigationType: NavigationType
+) {
+    val sharedViewModel: SharedViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
+    val bottomStartNavigation by sharedViewModel.bottomNavStart.collectAsState()
+
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val topLevelDestinations = MainLevelDestination.entries.toTypedArray()
+    val startDestination = bottomStartNavigation
+
+    val useRail = navigationType == NavigationType.NAV_RAIL
+
+    MainScaffoldLayout(
+        useRail = useRail,
+        items = topLevelDestinations,
+        startDestination = startDestination,
+        currentDestination = currentDestination,
+        navController = navController,
+        badgeFavorite = favoriteSize,
+        badgeNotification = notificationSize,
+        badgeCart = cartSize,
+        userName = userName,
+        userImage = userImage,
+        isDarkMode = isDarkMode,
+        onLogoutClick = onLogoutClick,
+        onNavigateToDetail = onNavigateToDetail,
+        onNavigateToStatus = onNavigateToStatus,
+        onNavigateToCart = onNavigateToCart,
+        onNavigateToNotification = onNavigateToNotification,
+        onNavigateToModular = onNavigateToModular,
+        onToggleTheme = onToggleTheme
+    )
+}
+
+@Composable
+fun MainScaffoldLayout(
+    useRail: Boolean,
+    items: Array<MainLevelDestination>,
+    currentDestination: NavDestination?,
+    startDestination : MainLevelDestination,
+    navController: NavHostController,
+    badgeFavorite: Int,
+    badgeNotification: Int,
+    badgeCart: Int,
+    userName: String,
+    userImage : String,
+    isDarkMode: Boolean,
+    onLogoutClick: () -> Unit,
+    onNavigateToDetail: (String) -> Unit,
+    onNavigateToStatus: () -> Unit,
+    onNavigateToCart: () -> Unit,
+    onNavigateToNotification: () -> Unit,
+    onNavigateToModular: () -> Unit,
+    onToggleTheme : (Boolean) -> Unit,
+) {
+    Row (modifier = Modifier.fillMaxSize()) {
+        if (useRail) {
+            NavigationSideBar(
+                items = items,
+                currentDestination = currentDestination,
+                navController = navController,
+                badgeFavorite = badgeFavorite,
+            )
+        }
+
+        Scaffold(
+            modifier = Modifier.navigationBarsPadding(),
+            topBar = {
+                MainTopAppBar(
+                    name = userName,
+                    image = userImage,
+                    badgeNotification = badgeNotification,
+                    badgeCart = badgeCart,
+                    onNavigateToNotification = onNavigateToNotification,
+                    onNavigateToCart = onNavigateToCart,
+                    onNavigateToModular = onNavigateToModular
+                )
+            },
+            bottomBar = {
+                if (!useRail) {
+                    NavigationBottomBar(
+                        items = items,
+                        currentDestination = currentDestination,
+                        navController = navController,
+                        badgeFavorite = badgeFavorite
+                    )
+                }
+            }
+        ) {
+            Column(modifier = Modifier.fillMaxSize().padding(it)
+            ) {
+                BottomNavHost(
+                    navController = navController,
+                    startDestination = startDestination,
+                    isDarkMode = isDarkMode,
+                    onNavigateToDetail = onNavigateToDetail,
+                    onLogoutClick = onLogoutClick,
+                    onToggleTheme = onToggleTheme,
+                    onNavigateToStatus = onNavigateToStatus
+                )
+            }
+        }
+    }
+}
+
+
+enum class NavigationType{
+    BOTTOM_NAV,NAV_RAIL
+}
+
+@Preview("Light Mode", device = Devices.PIXEL_3)
+@Preview("Dark Mode", device = Devices.PIXEL_3, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun MainBottomPreview() {
+    EcommerceAppTheme {
+        MainScreen(
+            cartSize = 2,
+            favoriteSize =2,
+            notificationSize = 0,
+            userName = "Test",
+            userImage = "",
+            isDarkMode = false,
+            onLogoutClick = {},
+            onNavigateToDetail = {},
+            onNavigateToStatus = {},
+            onNavigateToCart = {},
+            onNavigateToNotification = {},
+            onNavigateToModular = {},
+            onToggleTheme = {},
+            navigationType = NavigationType.BOTTOM_NAV
+        )
+    }
+}
+
+@Preview("Light Mode", device = Devices.TABLET)
+@Preview("Dark Mode", device = Devices.TABLET, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun MainRailPreview() {
+    EcommerceAppTheme {
+        MainScreen(
+            cartSize = 2,
+            favoriteSize =2,
+            notificationSize = 0,
+            userName = "Test",
+            userImage = "",
+            isDarkMode = false,
+            onLogoutClick = {},
+            onNavigateToDetail = {},
+            onNavigateToStatus = {},
+            onNavigateToCart = {},
+            onNavigateToNotification = {},
+            onNavigateToModular = {},
+            onToggleTheme = {},
+            navigationType = NavigationType.NAV_RAIL
+        )
+    }
+}
