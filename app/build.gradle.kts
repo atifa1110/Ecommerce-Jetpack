@@ -132,6 +132,54 @@ tasks.register("cleanJacocoReport") {
     }
 }
 
+tasks.register<JacocoReport>("jacocoMergedReport") {
+    dependsOn(
+        ":app:testDebugUnitTest",
+        ":core:testDebugUnitTest"
+    )
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val excludes = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "**/di/**",
+        "**/*_Factory*.*",
+        "**/*_HiltModules*.*",
+        "**/*_Impl*.*",
+        "**/databinding/**"
+    )
+
+    // Menggunakan layout.buildDirectory
+    val appClasses = layout.buildDirectory.dir("../app/build/tmp/kotlin-classes/debug").get().asFile
+    val coreClasses = layout.buildDirectory.dir("../core/build/tmp/kotlin-classes/debug").get().asFile
+
+    classDirectories.setFrom(
+        fileTree(appClasses) { exclude(excludes) },
+        fileTree(coreClasses) { exclude(excludes) }
+    )
+
+    sourceDirectories.setFrom(
+        files(
+            "${project(":app").projectDir}/src/main/java",
+            "${project(":app").projectDir}/src/main/kotlin",
+            "${project(":core").projectDir}/src/main/java",
+            "${project(":core").projectDir}/src/main/kotlin"
+        )
+    )
+
+    executionData.setFrom(
+        layout.buildDirectory.file("../app/build/jacoco/testDebugUnitTest.exec"),
+        layout.buildDirectory.file("../core/build/jacoco/testDebugUnitTest.exec")
+    )
+}
+
 
 dependencies {
 
