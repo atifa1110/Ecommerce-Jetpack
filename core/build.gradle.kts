@@ -16,9 +16,9 @@ val localProperties = Properties().apply {
     }
 }
 
-val baseUrl = localProperties["BASE_URL"] as String
-val apiKey = localProperties["API_KEY"] as String
-val authKey = localProperties["AUTH_KEY"] as String
+val baseUrl = localProperties["BASE_URL"]?.toString() ?: ""
+val apiKey = localProperties["API_KEY"]?.toString() ?: ""
+val authKey = localProperties["AUTH_KEY"]?.toString() ?: ""
 
 android {
     namespace = "com.example.core"
