@@ -1,11 +1,15 @@
 package com.example.ecommerceapp.screen.profile
 
+import android.content.Context
 import android.net.Uri
+import androidx.core.content.FileProvider
 import app.cash.turbine.test
 import com.example.core.data.network.response.EcommerceResponse
 import com.example.core.domain.usecase.ProfileUseCase
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
@@ -132,5 +136,28 @@ class ProfileViewModelTest {
     }
 
 
+    @Test
+    fun `createImageFileAndUri sets imageUri and file`() {
+        // Arrange
+        val context = mockk<Context>(relaxed = true)
+        val dir = mockk<File>(relaxed = true)
+        val file = mockk<File>(relaxed = true)
+        val uri = mockk<Uri>()
+
+        every { context.externalCacheDir } returns dir
+        every { context.packageName } returns "com.example.ecommerceapp"
+
+        mockkStatic(File::class)
+        every { File.createTempFile(any(), any(), dir) } returns file
+
+        mockkStatic(FileProvider::class)
+        every { FileProvider.getUriForFile(context, "com.example.ecommerceapp.provider", file) } returns uri
+
+        val result = viewModel.createImageFileAndUri(context)
+        // Assert
+        assertEquals(uri, result)
+        assertEquals(uri, viewModel.uiState.value.imageUri)
+        assertEquals(file, viewModel.uiState.value.userImage)
+    }
 
 }

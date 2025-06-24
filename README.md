@@ -28,22 +28,22 @@ Tokopaerbe is an e-commerce application that sells a variety of electronic produ
 
 ## Technology Stack
 
-| Category                  | Technology / Library                 |
-|---------------------------|------------------------------------|
-| Language                  | Kotlin                             |
-| UI                        | ViewBinding, Material 3            |
-| Concurrency & Reactive    | Kotlin Coroutines, LiveData, Flow  |
-| Dependency Injection      | Hilt, Koin (optional), Manual DI   |
-| Image Loading             | Glide, Coil                       |
-| JSON Parsing              | Gson, Moshi                      |
-| Data Storage              | SharedPreferences, DataStore        |
-| Build System              | Gradle Groovy, Kotlin DSL, buildSrc, build-logic  |
-| Architecture             | Single Activity, MVVM, Clean Architecture        |
-| Local Database            | Room                               |
-| Network                   | Retrofit, Chucker                  |
-| Firebase Services         | Authentication, Remote Config, Cloud Messaging, Crashlytics, Analytics  |
-| Testing                   | Unit Testing                      |
-| Code Quality              | Detekt, Proguard                  |
+| Category                  | Technology / Library              |
+|---------------------------|---------------------------------|
+| Language                  | Kotlin                          |
+| UI                        | Material 3         |
+| Concurrency & Reactive    | Kotlin Coroutines, LiveData, Flow |
+| Dependency Injection      | Hilt, Manual DI   |
+| Image Loading             | Glide, Coil                    |
+| JSON Parsing              | Gson, Moshi                   |
+| Data Storage              | SharedPreferences, DataStore     |
+| Build System              | Gradle Groovy, Kotlin DSL, buildSrc, build-logic |
+| Architecture             | Single Activity, MVVM, Clean Architecture     |
+| Local Database            | Room                            |
+| Network                   | Retrofit, Chucker               |
+| Firebase Services         | Authentication, Remote Config, Cloud Messaging, Crashlytics, Analytics |
+| Testing                   | Unit Testing                   |
+| Code Quality              | Detekt, Proguard               |
 
 ---
 
