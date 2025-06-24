@@ -1,4 +1,5 @@
 # Tokopaerbe - Ecommerce App
+[![codecov](https://codecov.io/github/atifa1110/Ecommerce-Jetpack/graph/badge.svg?token=dxoOrgZJoS)](https://codecov.io/github/atifa1110/Ecommerce-Jetpack)
 
 Tokopaerbe is an e-commerce application that sells a variety of electronic products, featuring functionalities such as pre-login, store browsing, order fulfillment, shopping cart, wishlist, product details, and Firebase integration 
 
