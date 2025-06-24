@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Devices
@@ -26,16 +28,19 @@ import com.example.ecommerceapp.components.NavigationBottomBar
 import com.example.ecommerceapp.components.NavigationSideBar
 import com.example.ecommerceapp.graph.BottomNavHost
 import com.example.ecommerceapp.graph.MainLevelDestination
-import com.example.ecommerceapp.screen.shared.SharedViewModel
+import com.example.ecommerceapp.graph.TransactionDestination
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 
 @Composable
 fun MainRoute(
+    startTab: String?,
     isDarkMode: Boolean,
     onNavigateToLogin : () -> Unit,
     onNavigateToDetail: (String) -> Unit,
     onNavigateToCart:() -> Unit,
     onNavigateToStatus:() -> Unit,
+    onNavigateToNotification : () -> Unit,
+    onNavigateToModular : () -> Unit,
     onToggleTheme : (Boolean) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
@@ -44,12 +49,14 @@ fun MainRoute(
     LaunchedEffect(Unit) {
         viewModel.getCartSize()
         viewModel.getWishlistSize()
+        viewModel.getNotificationSize()
     }
 
     MainScreen(
-        cartSize = uiState.cartSize?:0,
-        favoriteSize = uiState.wishlistSize?:0,
-        notificationSize = 0,
+        startTab = startTab,
+        cartSize = uiState.cartSize,
+        favoriteSize = uiState.wishlistSize,
+        notificationSize = uiState.notificationSize,
         userName = uiState.userName,
         userImage = uiState.userImage,
         isDarkMode = isDarkMode,
@@ -57,8 +64,8 @@ fun MainRoute(
         onNavigateToDetail =onNavigateToDetail,
         onNavigateToStatus = onNavigateToStatus,
         onNavigateToCart = onNavigateToCart,
-        onNavigateToNotification = {},
-        onNavigateToModular = {},
+        onNavigateToNotification = onNavigateToNotification,
+        onNavigateToModular = onNavigateToModular,
         onToggleTheme = onToggleTheme,
         navigationType = NavigationType.BOTTOM_NAV
     )
@@ -66,6 +73,7 @@ fun MainRoute(
 
 @Composable
 fun MainScreen(
+    startTab: String?,
     cartSize: Int,
     favoriteSize: Int,
     notificationSize: Int,
@@ -81,15 +89,11 @@ fun MainScreen(
     onToggleTheme : (Boolean) -> Unit,
     navigationType: NavigationType
 ) {
-    val sharedViewModel: SharedViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
-    val bottomStartNavigation by sharedViewModel.bottomNavStart.collectAsState()
-
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val topLevelDestinations = MainLevelDestination.entries.toTypedArray()
-    val startDestination = bottomStartNavigation
-
+    val startDestination = startTab ?: MainLevelDestination.Home.route
     val useRail = navigationType == NavigationType.NAV_RAIL
 
     MainScaffoldLayout(
@@ -119,7 +123,7 @@ fun MainScaffoldLayout(
     useRail: Boolean,
     items: Array<MainLevelDestination>,
     currentDestination: NavDestination?,
-    startDestination : MainLevelDestination,
+    startDestination : String,
     navController: NavHostController,
     badgeFavorite: Int,
     badgeNotification: Int,
@@ -196,6 +200,7 @@ enum class NavigationType{
 fun MainBottomPreview() {
     EcommerceAppTheme {
         MainScreen(
+            startTab = TransactionDestination.route,
             cartSize = 2,
             favoriteSize =2,
             notificationSize = 0,
@@ -220,6 +225,7 @@ fun MainBottomPreview() {
 fun MainRailPreview() {
     EcommerceAppTheme {
         MainScreen(
+            startTab = TransactionDestination.route,
             cartSize = 2,
             favoriteSize =2,
             notificationSize = 0,

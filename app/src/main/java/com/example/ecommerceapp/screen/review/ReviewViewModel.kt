@@ -3,10 +3,11 @@ package com.example.ecommerceapp.screen.review
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ecommerceapp.data.network.response.EcommerceResponse
-import com.example.ecommerceapp.data.ui.Review
-import com.example.ecommerceapp.data.ui.mapper.asReview
+import com.example.core.data.network.response.EcommerceResponse
+import com.example.core.ui.model.Review
+import com.example.core.ui.mapper.asReview
 import com.example.ecommerceapp.graph.ReviewDestination
+import com.example.core.domain.usecase.GetReviewProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

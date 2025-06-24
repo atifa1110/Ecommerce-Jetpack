@@ -1,0 +1,18 @@
+{
+  "code": 200,
+  "message": "OK",
+  "data": [
+    {
+      "userName": "John",
+      "userImage": "image",
+      "userRating": 4,
+      "userReview": "review"
+    },
+    {
+      "userName": "Doe",
+      "userImage": "image",
+      "userRating": 5,
+      "userReview": "review"
+    }
+  ]
+}

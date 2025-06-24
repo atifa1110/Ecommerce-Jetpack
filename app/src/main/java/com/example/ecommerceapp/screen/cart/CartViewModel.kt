@@ -2,9 +2,13 @@ package com.example.ecommerceapp.screen.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ecommerceapp.data.network.response.EcommerceResponse
-import com.example.ecommerceapp.data.ui.Cart
-import com.example.ecommerceapp.data.ui.mapper.asCart
+import com.example.core.data.network.response.EcommerceResponse
+import com.example.core.ui.model.Cart
+import com.example.core.ui.mapper.asCart
+import com.example.ecommerceapp.firebase.CartAnalytics
+import com.example.core.domain.usecase.DeleteCartUseCase
+import com.example.core.domain.usecase.GetCartUseCase
+import com.example.core.domain.usecase.UpdateCartQuantityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +31,8 @@ data class CartUiState(
 class CartViewModel @Inject constructor(
     private val getCartUseCase: GetCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
-    private val deleteCartUseCase: DeleteCartUseCase
+    private val deleteCartUseCase: DeleteCartUseCase,
+    private val cartAnalytics: CartAnalytics
 ) : ViewModel(){
 
     private val _uiState = MutableStateFlow(CartUiState())
@@ -51,6 +56,7 @@ class CartViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
+
     fun loadCartItems() = viewModelScope.launch {
          getCartUseCase.invoke().collect { result ->
              when(result){
@@ -58,6 +64,7 @@ class CartViewModel @Inject constructor(
                      _uiState.update {
                          it.copy(isLoading = false,isError = true)
                      }
+                     cartAnalytics.trackViewCartFailed(result.error)
                  }
                  EcommerceResponse.Loading -> {
                      _uiState.update {
@@ -66,8 +73,9 @@ class CartViewModel @Inject constructor(
                  }
                  is EcommerceResponse.Success -> {
                      _uiState.update {
-                         it.copy(isLoading = false, carts = result.value.map { it.asCart() })
+                         it.copy(isLoading = false, isError = false, carts = result.value.map { it.asCart() })
                      }
+                     cartAnalytics.trackViewCart(result.value.map { it.asCart() })
                  }
              }
         }
@@ -80,62 +88,56 @@ class CartViewModel @Inject constructor(
             }
             state.copy(carts = updated)
         }
+        cartAnalytics.trackBuyButtonClicked(totalCheckedPrice.value)
     }
 
-    fun selectAll() {
+    fun setAllChecked(isChecked: Boolean) {
         _uiState.update { state ->
-            state.copy(carts = state.carts.map { it.copy(isCheck = true) })
+            state.copy(carts = state.carts.map { it.copy(isCheck = isChecked) })
         }
     }
 
-    fun clearSelection() {
-        _uiState.update { state ->
-            state.copy(carts = state.carts.map { it.copy(isCheck = false) })
-        }
-    }
+    fun updateQuantity(productId: String, isIncrement: Boolean) {
+        val cartItem = _uiState.value.carts.find { it.productId == productId } ?: return
 
-    fun increaseQuantity(productId: String) {
+        val newQty = if (isIncrement) cartItem.quantity + 1 else cartItem.quantity - 1
+
+        // Only update if new quantity is within valid range
+        val isValid = (isIncrement && newQty <= cartItem.stock) || (!isIncrement && newQty >= 1)
+        if (!isValid) return
+
+        // Update local state
         _uiState.update { state ->
             val updatedCarts = state.carts.map {
-                if (it.productId == productId && it.quantity < it.stock) {
-                    val newQty = it.quantity + 1
-                    viewModelScope.launch {
-                        updateCartQuantityUseCase(productId, newQty)
-                    }
-                    it.copy(quantity = newQty)
-                } else it
+                if (it.productId == productId) it.copy(quantity = newQty) else it
             }
             state.copy(carts = updatedCarts)
         }
-    }
 
-    fun decreaseQuantity(productId: String) {
-        _uiState.update { state ->
-            val updatedCarts = state.carts.map {
-                if (it.productId == productId && it.quantity > 1) {
-                    val newQty = it.quantity - 1
-                    viewModelScope.launch {
-                        updateCartQuantityUseCase(productId, newQty)
-                    }
-                    it.copy(quantity = newQty)
-                } else it
-            }
-            state.copy(carts = updatedCarts)
+        // Sync with server and track analytics
+        viewModelScope.launch {
+            updateCartQuantityUseCase(productId, newQty)
+            cartAnalytics.trackCartQuantityChanged(
+                productId = cartItem.productId,
+                productName = cartItem.productName,
+                variant = cartItem.variantName,
+                newQuantity = newQty,
+                action = if (isIncrement) "increase" else "decrease"
+            )
         }
     }
 
     fun deleteCartItem(productId: String) {
         viewModelScope.launch {
             deleteCartUseCase(productId)
-            // Update local state after deletion
             _uiState.update { state ->
                 state.copy(
                     carts = state.carts.filterNot { it.productId == productId }
                 )
             }
+            cartAnalytics.trackRemoveFromCart(productId)
         }
     }
-
 
     fun deleteCheckedItems() {
         val checkedItems = _uiState.value.carts.filter { it.isCheck }
@@ -149,6 +151,5 @@ class CartViewModel @Inject constructor(
             }
         }
     }
-
 
 }

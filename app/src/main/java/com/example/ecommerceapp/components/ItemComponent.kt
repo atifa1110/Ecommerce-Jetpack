@@ -1,6 +1,8 @@
 package com.example.ecommerceapp.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +35,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -42,8 +43,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -61,13 +60,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.ecommerceapp.R
-import com.example.ecommerceapp.data.ui.Cart
-import com.example.ecommerceapp.data.ui.ItemTransaction
-import com.example.ecommerceapp.data.ui.Payment
-import com.example.ecommerceapp.data.ui.Product
-import com.example.ecommerceapp.data.ui.Review
-import com.example.ecommerceapp.data.ui.Transaction
-import com.example.ecommerceapp.data.ui.Wishlist
+import com.example.core.ui.model.Cart
+import com.example.core.ui.model.ItemTransaction
+import com.example.core.ui.model.Notification
+import com.example.core.ui.model.Payment
+import com.example.core.ui.model.Product
+import com.example.core.ui.model.Review
+import com.example.core.ui.model.Transaction
+import com.example.core.ui.model.Wishlist
 import com.example.ecommerceapp.screen.status.RatingBar
 import com.example.ecommerceapp.ui.theme.DarkPurple
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
@@ -1219,6 +1219,94 @@ fun PaymentListCart(
     }
 }
 
+@Composable
+fun NotificationListCard(
+    notification: Notification,
+    setNotificationRead: (id: Int, read: Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                if (notification.isRead) MaterialTheme.colorScheme.background
+                else DarkPurple
+            )
+            .clickable {
+                notification.id?.let { setNotificationRead(it, true) }
+            }
+            .padding(top = 16.dp, start = 16.dp)
+    ) {
+        Card(
+            modifier = Modifier.size(36.dp),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if(notification.image.isEmpty()){
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = painterResource(id = R.drawable.thumbnail),
+                        contentDescription = "Card")
+                }else{
+                    AsyncImage(
+                        modifier = Modifier.fillMaxSize(),
+                        model = notification.image,
+                        contentDescription = "Notification Image"
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Column {
+            Column(modifier = Modifier.padding(end = 16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = notification.type,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.W400,
+                        color = if (notification.isRead)
+                            MaterialTheme.colorScheme.onBackground else Color.Black
+                    )
+
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Text(
+                            text = "${notification.date}, ${notification.time}",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.W400,
+                            color = if (notification.isRead)
+                                MaterialTheme.colorScheme.onBackground else Color.Black
+                        )
+                    }
+                }
+
+                Text(
+                    text = notification.title,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.W600,
+                    color = if (notification.isRead)
+                        MaterialTheme.colorScheme.onBackground else Color.Black
+                )
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = notification.body,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.W400,
+                    color = if (notification.isRead)
+                        MaterialTheme.colorScheme.onBackground else Color.Black
+                )
+            }
+            HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
+        }
+    }
+}
+
 @Preview("Light Mode", device = Devices.PIXEL_3)
 @Composable
 fun PaymentCardPreview(){
@@ -1259,6 +1347,25 @@ fun TransactionCardPreview(){
                 name = "DELL ALIENWARE M15 R5 RYZEN 7 5800 16GB 512SSD RTX3050Ti 4GB W10 15.6F - Hitam, UNIT"
             ),
             onNavigateToStatus = {}
+        )
+    }
+}
+
+@Preview("Light Mode", device = Devices.PIXEL_3)
+@Preview("Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun CardNotificationPreview() {
+    val notification = Notification(
+        1,"Telkomsel Award 2023",
+        "Nikmati Kemeriahan ulang tahun Telkomsel pada har jumat 21 Juli 2023 pukul 19.00 - 21.00 WIB langsung dari Beach City International Stadium dengan berbagai kemudahan untuk mendapatkan aksesnya.",
+        "",
+        "Promo",
+        "21 Jul 2023","12:34", false
+    )
+    EcommerceAppTheme {
+        NotificationListCard(
+            notification = notification,
+            setNotificationRead = { id, read -> },
         )
     }
 }

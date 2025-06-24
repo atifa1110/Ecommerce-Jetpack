@@ -68,15 +68,16 @@ import com.example.ecommerceapp.components.BackTopAppBar
 import com.example.ecommerceapp.components.DotIndicatorWithScaling
 import com.example.ecommerceapp.components.ErrorPage
 import com.example.ecommerceapp.components.LoaderScreen
-import com.example.ecommerceapp.data.ui.Cart
-import com.example.ecommerceapp.data.ui.ProductDetail
-import com.example.ecommerceapp.data.ui.ProductVariant
+import com.example.core.ui.model.ProductDetail
+import com.example.core.ui.model.ProductVariant
 import com.example.ecommerceapp.screen.shared.SharedViewModel
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 import com.example.ecommerceapp.utils.currency
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun DetailRoute(
+    onNavigateToBack : () -> Unit,
     onNavigateToCheckout :() -> Unit,
     onNavigateToReview : (String) -> Unit,
     viewModel: DetailViewModel = hiltViewModel()
@@ -91,6 +92,16 @@ fun DetailRoute(
         viewModel.loadDetailProduct()
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is DetailEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
+
     DetailScreen(
         uiState = uiState,
         context = context,
@@ -100,12 +111,13 @@ fun DetailRoute(
         onWishlistDetail = viewModel::onWishlistDetail,
         onAddToCart = viewModel::onAddToCart,
         onCheckout = {
+            viewModel.checkoutAnalytics()
             sharedViewModel.setDetailCartItems(
                 uiState.selectedVariant?: ProductVariant("",0),uiState.productDetail)
             onNavigateToCheckout()
         },
-        snackBarMessageShown = viewModel::snackBarMessageShown,
-        onNavigateToReview = {onNavigateToReview(uiState.id)}
+        onNavigateToReview = {onNavigateToReview(uiState.id)},
+        onNavigateToBack = onNavigateToBack
     )
 
 }
@@ -125,8 +137,8 @@ fun DetailScreen(
     onWishlistDetail : () -> Unit,
     onAddToCart : () -> Unit,
     onCheckout : () -> Unit,
-    snackBarMessageShown : () -> Unit,
     onNavigateToReview : () -> Unit,
+    onNavigateToBack : () -> Unit,
 ) {
     if(uiState.isLoading){
         loadingContent()
@@ -134,9 +146,10 @@ fun DetailScreen(
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
             topBar = {
-                BackTopAppBar(titleResId = R.string.detail, onNavigateToBack = {})
+                BackTopAppBar(titleResId = R.string.detail, onNavigateToBack = onNavigateToBack)
             },
             bottomBar = {
+                if(!uiState.isError) {
                     HorizontalDivider()
                     Column(Modifier.padding(16.dp)) {
                         Row(
@@ -180,6 +193,7 @@ fun DetailScreen(
                             }
                         }
                     }
+                }
             }
         ) {
             DetailContent(
@@ -195,12 +209,6 @@ fun DetailScreen(
                 onNavigateToReview = onNavigateToReview,
                 modifier = Modifier.padding(it)
             )
-        }
-        if (!uiState.userMessage.isNullOrBlank()) {
-            LaunchedEffect(uiState.userMessage) {
-                snackBarHostState.showSnackbar(uiState.userMessage)
-                snackBarMessageShown() // Called after snackbar hides
-            }
         }
     }
 }
@@ -558,9 +566,9 @@ fun DetailPreview() {
             onVariantSelected = {},
             onWishlistDetail = {},
             onAddToCart = {},
-            snackBarMessageShown = {},
             onNavigateToReview = {},
-            onCheckout = {}
+            onCheckout = {},
+            onNavigateToBack = {}
         )
     }
 }

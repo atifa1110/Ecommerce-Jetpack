@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    jacoco
 }
 
 val localProperties = Properties().apply {
@@ -17,7 +18,9 @@ val localProperties = Properties().apply {
     }
 }
 
-val baseUrl = localProperties["BASE_URL"] as String? ?: "http://localhost:5000/"
+val baseUrl = localProperties["BASE_URL"] as String
+val apiKey = localProperties["API_KEY"] as String
+val authKey = localProperties["AUTH_KEY"] as String
 
 android {
     namespace = "com.example.ecommerceapp"
@@ -32,6 +35,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "AUTH_KEY", "\"$authKey\"")
     }
 
     buildTypes {
@@ -55,7 +60,78 @@ android {
         compose = true
     }
 
+    val jacocoTestReport = tasks.create("jacocoTestReport")
+
+    androidComponents.onVariants { variant ->
+        val variantCap = variant.name.replaceFirstChar { it.uppercase() }
+        val testTaskName = "test${variantCap}UnitTest"
+
+        val reportTask = tasks.register("jacoco${testTaskName}Report", JacocoReport::class) {
+            dependsOn(testTaskName)
+
+            reports {
+                html.required.set(true)
+                xml.required.set(true) // For SonarQube or CI
+            }
+
+            val classesDir = layout.buildDirectory
+                .dir("tmp/kotlin-classes/${variant.name}")
+                .get()
+                .asFileTree
+                .matching {
+                    include("**/*ViewModel.class") // ⬅️ Tambahkan baris ini
+                    exclude(coverageExclusions)
+                }
+
+            val execFile = layout.buildDirectory
+                .file("jacoco/$testTaskName.exec")
+                .get()
+                .asFile
+
+            classDirectories.setFrom(classesDir)
+            sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+            executionData.setFrom(execFile)
+        }
+
+        jacocoTestReport.dependsOn(reportTask)
+    }
 }
+
+val coverageExclusions = listOf(
+    "**/R.class",
+    "**/R$*.class",
+    "**/BuildConfig.*",
+    "**/Manifest*.*",
+    "**/*Test*.*"
+)
+
+configure<JacocoPluginExtension> {
+    toolVersion = "0.8.10"
+}
+
+tasks.withType<Test>().configureEach {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+tasks.register("cleanJacocoReport") {
+    doLast {
+        val reportDir = layout.buildDirectory
+            .dir("reports/jacoco")
+            .get()
+            .asFile
+
+        if (reportDir.exists()) {
+            reportDir.deleteRecursively()
+            println("✅ JaCoCo reports deleted from ${reportDir.path}")
+        } else {
+            println("ℹ️ No JaCoCo reports found in ${reportDir.path}")
+        }
+    }
+}
+
 
 dependencies {
 
@@ -67,6 +143,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.paging.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -135,4 +212,27 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.crashlytics)
+
+    //permission`1
+    implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.compose.runtime.livedata)
+
+    //test
+    testImplementation(libs.truth)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockwebserver)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.datastore.core)
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+
+    //robolectric
+    testImplementation(libs.robolectric)
+
+    implementation(project(":screen"))
+    implementation(project(":core"))
+    testImplementation(kotlin("test"))
 }

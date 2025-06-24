@@ -1,0 +1,4 @@
+{
+  "code": 400,
+  "message": "Request must be userName or userImage"
+}

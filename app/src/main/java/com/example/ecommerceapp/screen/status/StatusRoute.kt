@@ -50,11 +50,12 @@ import com.example.ecommerceapp.R
 import com.example.ecommerceapp.components.BackCenterTopAppBar
 import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.TextComponent
-import com.example.ecommerceapp.data.ui.Fulfillment
+import com.example.core.ui.model.Fulfillment
 import com.example.ecommerceapp.screen.shared.SharedViewModel
 import com.example.ecommerceapp.ui.theme.DarkPurple
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 import com.example.ecommerceapp.utils.currency
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun StatusRoute(
@@ -70,6 +71,18 @@ fun StatusRoute(
     LaunchedEffect(uiState.isSuccess) {
         if(uiState.isSuccess) {
             onNavigateToTransaction()
+            sharedViewModel.clearFulfillment()
+            sharedViewModel.clearCheckedCarts()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is StatusEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+            }
         }
     }
 
@@ -77,7 +90,6 @@ fun StatusRoute(
         isLoading = uiState.isLoading,
         rating = uiState.rating,
         review = uiState.review,
-        userMessage = uiState.userMessage,
         onReviewChanged = viewModel::onReviewChanged,
         onRatingChanged = viewModel::onRatingChanged,
         onRatingTransaction = {
@@ -86,7 +98,6 @@ fun StatusRoute(
         onBackButton = onBackButton,
         fulfillment = sharedUiState.fulfillment,
         snackBarHostState = snackBarHostState,
-        snackBarMessageShown = viewModel::clearUserMessage
     )
 }
 
@@ -95,7 +106,6 @@ fun StatusScreen(
     isLoading : Boolean,
     rating: Int,
     review: String,
-    userMessage: String?,
     onReviewChanged : (String) -> Unit,
     onRatingChanged : (Int) -> Unit,
     onRatingTransaction : () -> Unit,
@@ -105,7 +115,6 @@ fun StatusScreen(
         LoaderScreen(modifier = Modifier.fillMaxSize())
     },
     snackBarHostState : SnackbarHostState,
-    snackBarMessageShown :() -> Unit
 ) {
     if(isLoading){
         loadingContent()
@@ -157,13 +166,6 @@ fun StatusScreen(
                 onReviewChanged = onReviewChanged,
                 onRatingChanged = onRatingChanged,
             )
-        }
-
-        if (userMessage?.isNotBlank() == true) {
-            LaunchedEffect(userMessage) {
-                snackBarHostState.showSnackbar(userMessage)
-                snackBarMessageShown() // Called after snackbar hides
-            }
         }
     }
 }
@@ -440,14 +442,12 @@ fun StatusPreview(){
             isLoading = false,
             rating = 4,
             review = "",
-            userMessage = "",
             onReviewChanged = {},
             onRatingTransaction = {},
             onBackButton = {},
             onRatingChanged = {},
             fulfillment = Fulfillment("1",false,"13 Oct 2020","13:70","BCA",35000000),
             snackBarHostState = snackBarHostState,
-            snackBarMessageShown = {}
         )
     }
 }

@@ -1,0 +1,8 @@
+{
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "userName": "Test",
+    "userImage": "http://192.168.190.125:8080/static/images/"
+  }
+}

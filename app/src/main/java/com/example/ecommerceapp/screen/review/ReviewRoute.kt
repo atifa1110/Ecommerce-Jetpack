@@ -6,16 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,10 +20,11 @@ import com.example.ecommerceapp.components.BackTopAppBar
 import com.example.ecommerceapp.components.ErrorPage
 import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.ReviewListCard
-import com.example.ecommerceapp.data.ui.Review
+import com.example.core.ui.model.Review
 
 @Composable
 fun ReviewRoute(
+    onNavigateToBack: () -> Unit,
     viewModel: ReviewViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -39,16 +32,18 @@ fun ReviewRoute(
     LaunchedEffect(Unit) {
         viewModel.getReviewProduct()
     }
-    ReviewScreen(uiState = uiState)
+
+    ReviewScreen(uiState = uiState, onNavigateToBack = onNavigateToBack)
 }
 
 @Composable
 fun ReviewScreen(
-    uiState: ReviewUiState
+    uiState: ReviewUiState,
+    onNavigateToBack: () -> Unit,
 ) {
     Scaffold(
         topBar = {
-            BackTopAppBar(titleResId = R.string.review_buyer) { }
+            BackTopAppBar(titleResId = R.string.review_buyer, onNavigateToBack = onNavigateToBack)
         },
     ) {
         ReviewContent(
@@ -82,12 +77,11 @@ fun ReviewContent(
                     message = stringResource(id = R.string.resource),
                     button = stringResource(R.string.refresh),
                     onButtonClick = {},
-                    1F
+                    0F
                 )
             }
 
             else -> {
-
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(reviews) { review ->
                             ReviewListCard(

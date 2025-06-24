@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">이커머스 앱</string>
+    <string name="join">지금 가입하기</string>
+    <string name="skip">건너뛰기</string>
+    <string name="next">다음</string>
+    <string name="login">로그인</string>
+    <string name="email">이메일</string>
+    <string name="email_invalid">유효하지 않은 이메일</string>
+    <string name="password">비밀번호</string>
+    <string name="password_invalid">유효하지 않은 비밀번호</string>
+    <string name="password_min">최소 8자</string>
+    <string name="hide_password">비밀번호 숨기기</string>
+    <string name="show_password">비밀번호 표시</string>
+    <string name="register_with">또는 다음으로 가입하기</string>
+    <string name="login_with">또는 다음으로 로그인하기</string>
+    <string name="by_entering_login">로그인하면 다음에 동의하는 것입니다 </string>
+    <string name="by_entering_register">가입하면 다음에 동의하는 것입니다 </string>
+    <string name="term_condition">약관 및 조건 </string>
+    <string name="and">및 </string>
+    <string name="privacy_policy">개인정보처리방침 </string>
+    <string name="toko_phincon">TokoPhincon.</string>
+    <string name="register">회원가입</string>
+    <string name="profile">프로필</string>
+    <string name="name">이름</string>
+    <string name="done">완료</string>
+    <string name="choose_picture">사진 선택</string>
+    <string name="gallery">갤러리</string>
+    <string name="camera">카메라</string>
+    <string name="icon_profile">프로필 아이콘</string>
+    <string name="home">홈</string>
+    <string name="store">스토어</string>
+    <string name="wishlist">즐겨찾기</string>
+    <string name="transaction">거래</string>
+    <string name="dark">다크</string>
+    <string name="light">라이트</string>
+    <string name="logout">로그아웃</string>
+    <string name="id">ID</string>
+    <string name="en">EN</string>
+    <string name="search">검색</string>
+    <string name="empty">비어 있음</string>
+    <string name="resource">요청하신 데이터가 없습니다</string>
+    <string name="internal">내부 서버 오류</string>
+    <string name="connection">연결</string>
+    <string name="connection_unavailable">연결을 사용할 수 없습니다</string>
+    <string name="refresh">새로 고침</string>
+    <string name="lowest">가장 저렴한</string>
+    <string name="highest">가장 비싼</string>
+    <string name="filter">필터</string>
+    <string name="sort">정렬</string>
+    <string name="reset">초기화</string>
+    <string name="category">카테고리</string>
+    <string name="price">가격</string>
+    <string name="apply">적용</string>
+    <string name="detail">상세정보</string>
+    <string name="buy_now">바로 구매</string>
+    <string name="cart">장바구니</string>
+    <string name="choose_variant">옵션 선택</string>
+    <string name="description">설명</string>
+    <string name="buyer_review">구매자 리뷰</string>
+    <string name="see_all">모두 보기</string>
+    <string name="buyer_satisfied">만족한 구매자</string>
+    <string name="rating">평점</string>
+    <string name="review">리뷰</string>
+    <string name="sold">판매됨</string>
+    <string name="item">상품</string>
+    <string name="total">총계</string>
+    <string name="buy">구매</string>
+    <string name="choose_all">모두 선택</string>
+    <string name="erase">삭제</string>
+    <string name="stock">재고 %1$d</string>
+    <string name="stock_few">남은 수량 %1$d</string>
+    <string name="pay">결제하기</string>
+    <string name="checkout">체크아웃</string>
+    <string name="purchased_items">구매한 상품</string>
+    <string name="payment">결제</string>
+    <string name="choose_payment">결제 방법 선택</string>
+    <string name="status">상태</string>
+    <string name="total_payment">총 결제금액</string>
+    <string name="payment_success">결제 성공</string>
+    <string name="leave_review">리뷰 남기기</string>
+    <string name="detail_transaction">거래 상세</string>
+    <string name="transaction_id">거래 ID</string>
+    <string name="date">날짜</string>
+    <string name="time">시간</string>
+    <string name="Success">성공</string>
+    <string name="payment_method">결제 방법</string>
+    <string name="total_spend">총 지출</string>
+    <string name="shopping">쇼핑</string>
+    <string name="review_buyer">구매자 리뷰</string>
+    <plurals name="item_count">
+        <item quantity="one">%d 개 상품</item>
+        <item quantity="other">%d 개 상품</item>
+    </plurals>
+    <string name="default_notification_channel_id">1</string>
+    <string name="request_notification_permission">권한 요청</string>
+    <string name="notification_permission_title">알림 권한</string>
+    <string name="notification_permission_description">이 앱에 알림 권한이 필요합니다. 권한을 허용해 주세요.</string>
+    <string name="notification_permission_settings">이 앱에 알림 권한이 필요합니다. 기기 설정에서 Make it So 앱의 알림을 활성화해 주세요.</string>
+    <string name="notification">알림</string>
+    <string name="ok">확인</string>
+    <string-array name="category_items">
+        <item>Apple</item>
+        <item>Asus</item>
+        <item>Dell</item>
+        <item>Lenovo</item>
+    </string-array>
+
+    <string-array name="sort_items">
+        <item>Ulasan</item>
+        <item>Penjualan</item>
+        <item>Harga Terendah</item>
+        <item>Harga Tertinggi</item>
+    </string-array>
+</resources>

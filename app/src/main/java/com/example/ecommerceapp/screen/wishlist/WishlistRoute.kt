@@ -43,6 +43,7 @@ import com.example.ecommerceapp.components.ErrorPage
 import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.WishlistCardGrid
 import com.example.ecommerceapp.components.WishlistCardList
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun WishlistRoute(
@@ -56,10 +57,19 @@ fun WishlistRoute(
         viewModel.getWishlist()
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is WishlistEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
+
     WishlistScreen(
         uiState = uiState,
         snackBarHostState = snackBarHostState,
-        snackBarMessageShown = viewModel::snackBarMessageShown,
         deleteWishlist = viewModel::deleteWishlist,
         setClickedGrid = viewModel::setClickedGrid,
         addToCart = viewModel::addToCart
@@ -70,7 +80,6 @@ fun WishlistRoute(
 fun WishlistScreen(
     uiState: WishlistUiState,
     snackBarHostState : SnackbarHostState,
-    snackBarMessageShown : () -> Unit,
     deleteWishlist : (String) -> Unit,
     setClickedGrid : () -> Unit,
     addToCart : (String) -> Unit
@@ -86,13 +95,6 @@ fun WishlistScreen(
             setClickedGrid = setClickedGrid,
             addToCart =addToCart
         )
-    }
-
-    if (!uiState.userMessage.isNullOrBlank()) {
-        LaunchedEffect(uiState.userMessage) {
-            snackBarHostState.showSnackbar(uiState.userMessage)
-            snackBarMessageShown() // Called after snackbar hides
-        }
     }
 }
 

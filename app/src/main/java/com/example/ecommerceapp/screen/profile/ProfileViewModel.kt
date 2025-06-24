@@ -5,10 +5,13 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ecommerceapp.data.network.response.EcommerceResponse
+import com.example.core.data.network.response.EcommerceResponse
+import com.example.core.domain.usecase.ProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
@@ -24,8 +27,12 @@ data class ProfileUiState(
     val userName : String = "",
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
-    val userMessage: String? = null
+    val isError : Boolean = false
 )
+
+sealed class ProfileEvent {
+    data class ShowSnackbar(val message: String) : ProfileEvent()
+}
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -34,6 +41,9 @@ class ProfileViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
+
+    private val _eventFlow = MutableSharedFlow<ProfileEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     fun setImageUri(uri: Uri?) {
         _uiState.update { it.copy(imageUri = uri) }
@@ -47,16 +57,8 @@ class ProfileViewModel @Inject constructor(
         _uiState.update { it.copy(userName = name) }
     }
 
-    fun showDialog() {
-        _uiState.update { it.copy(showImageDialog = true) }
-    }
-
-    fun hideDialog() {
-        _uiState.update { it.copy(showImageDialog = false) }
-    }
-
-    fun snackBarMessageShown(){
-        _uiState.update {  it.copy(userMessage = null) }
+    fun showDialog(isDialog : Boolean) {
+        _uiState.update { it.copy(showImageDialog = isDialog) }
     }
 
     fun createImageFileAndUri(context: Context): Uri {
@@ -85,7 +87,7 @@ class ProfileViewModel @Inject constructor(
 
         if (file == null || username.isBlank()) {
             // Handle error (e.g., show toast or snackbar)
-            _uiState.update { it.copy(userMessage = "Data is Empty") }
+            _eventFlow.emit(ProfileEvent.ShowSnackbar("Please input file and username correctly"))
             return@launch
         }
 
@@ -99,18 +101,20 @@ class ProfileViewModel @Inject constructor(
             when (result) {
                 is EcommerceResponse.Failure -> {
                     _uiState.update {
-                        it.copy(isLoading = false, isSuccess = false, userMessage = result.error)
+                        it.copy(isLoading = false, isSuccess = false, isError = true)
                     }
+                    _eventFlow.emit(ProfileEvent.ShowSnackbar(result.error))
                 }
                 is EcommerceResponse.Loading -> {
                     _uiState.update {
-                        it.copy(isLoading = true)
+                        it.copy(isLoading = true, isError = false, isSuccess = false)
                     }
                 }
                 is EcommerceResponse.Success -> {
                     _uiState.update {
-                        it.copy(isLoading = false, isSuccess = true, userMessage = "Upload Is Success")
+                        it.copy(isLoading = false, isSuccess = true, isError = false)
                     }
+                    _eventFlow.emit(ProfileEvent.ShowSnackbar("Upload is Success"))
                 }
             }
         }

@@ -2,12 +2,15 @@ package com.example.ecommerceapp.screen.status
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ecommerceapp.data.network.response.EcommerceResponse
-import com.example.ecommerceapp.data.ui.Fulfillment
-import com.example.ecommerceapp.data.ui.Review
+import com.example.core.data.network.response.EcommerceResponse
+import com.example.core.ui.model.Fulfillment
+import com.example.ecommerceapp.firebase.StatusAnalytics
+import com.example.core.domain.usecase.SetRatingTransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,16 +23,23 @@ data class StatusUiState(
     val isSuccess : Boolean = false,
     val rating : Int = 0,
     val review: String = "",
-    val userMessage : String? = null
 )
+
+sealed class StatusEvent {
+    data class ShowSnackbar(val message: String) : StatusEvent()
+}
 
 @HiltViewModel
 class StatusViewModel @Inject constructor(
-    private val setRatingTransactionUseCase: SetRatingTransactionUseCase
+    private val setRatingTransactionUseCase: SetRatingTransactionUseCase,
+    private val statusAnalytics: StatusAnalytics
 ) : ViewModel(){
 
     private val _uiState = MutableStateFlow(StatusUiState())
     val uiState: StateFlow<StatusUiState> = _uiState.asStateFlow()
+
+    private val _eventFlow = MutableSharedFlow<StatusEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     private fun isReviewInputValid(review: String, rating: Int): Boolean {
         return review.trim().isNotEmpty() && rating > 0
@@ -43,11 +53,8 @@ class StatusViewModel @Inject constructor(
         _uiState.update { it.copy(rating = rating) }
     }
 
-    fun clearUserMessage() {
-        _uiState.update { it.copy(userMessage = null) }
-    }
-
     fun setRatingTransaction (fulfillment: Fulfillment) = viewModelScope.launch {
+        statusAnalytics.trackDoneButtonClicked()
         val invoiceId = fulfillment.invoiceId
         val review = uiState.value.review
         val rating = uiState.value.rating
@@ -56,9 +63,9 @@ class StatusViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isError = true,
-                    userMessage = "Please enter a rating and review."
                 )
             }
+            _eventFlow.emit(StatusEvent.ShowSnackbar("Please enter a rating and review."))
             return@launch
         }
 
@@ -70,9 +77,10 @@ class StatusViewModel @Inject constructor(
                             isLoading = false,
                             isError = true,
                             isSuccess = false,
-                            userMessage = result.error
                         )
                     }
+                    _eventFlow.emit(StatusEvent.ShowSnackbar(result.error))
+                    statusAnalytics.trackStatusTransactionFailed(result.error)
                 }
                 EcommerceResponse.Loading -> {
                     _uiState.update {
@@ -89,9 +97,10 @@ class StatusViewModel @Inject constructor(
                             isLoading = false,
                             isError = false,
                             isSuccess = true,
-                            userMessage = result.value
                         )
                     }
+                    _eventFlow.emit(StatusEvent.ShowSnackbar(result.value))
+                    statusAnalytics.trackStatusTransaction(result.value)
                 }
             }
 

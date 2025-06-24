@@ -34,14 +34,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -59,14 +57,16 @@ import com.example.ecommerceapp.R
 import com.example.ecommerceapp.components.BackTopAppBar
 import com.example.ecommerceapp.components.CheckoutListCart
 import com.example.ecommerceapp.components.LoaderScreen
-import com.example.ecommerceapp.data.ui.Cart
-import com.example.ecommerceapp.data.ui.Payment
+import com.example.core.ui.model.Cart
+import com.example.core.ui.model.Payment
 import com.example.ecommerceapp.screen.shared.SharedViewModel
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 import com.example.ecommerceapp.utils.currency
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CheckoutRoute(
+    onNavigateToBack: () -> Unit,
     onNavigateToStatus : () -> Unit,
     onNavigateToPayment : () -> Unit,
     payment : Payment.PaymentItem,
@@ -84,21 +84,32 @@ fun CheckoutRoute(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is CheckoutEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
+
     CheckoutScreen(
         uiState = uiState,
         carts = state.checkedCarts,
         payment = payment,
         totalPrice = viewModel.calculateTotalPrice(state.checkedCarts),
         snackBarHostState = snackBarHostState,
+        onNavigateToBack = onNavigateToBack,
         onNavigateToPayment = {
+            viewModel.paymentButtonClick()
             onNavigateToPayment()
         },
         onPaymentTransaction = {
             viewModel.fulfillmentTransaction(payment,state.checkedCarts)
         },
-        snackBarMessageShown = viewModel::snackBarMessageShown,
-        increaseQuantity = sharedViewModel::increaseQuantity,
-        decreaseQuantity = sharedViewModel::decreaseQuantity
+        increaseQuantity = {sharedViewModel.updateQuantity(it,true)},
+        decreaseQuantity = {sharedViewModel.updateQuantity(it,false)}
     )
 }
 
@@ -110,11 +121,11 @@ fun CheckoutScreen(
     totalPrice : Int,
     snackBarHostState: SnackbarHostState,
     loadingContent: @Composable () -> Unit = {
-        LoaderScreen(modifier = Modifier.fillMaxSize().background(Color.Transparent))
+        LoaderScreen(modifier = Modifier.fillMaxSize())
     },
+    onNavigateToBack: () -> Unit,
     onNavigateToPayment : () -> Unit,
     onPaymentTransaction :  () -> Unit,
-    snackBarMessageShown : () -> Unit,
     increaseQuantity: (String) -> Unit,
     decreaseQuantity: (String) -> Unit,
 ){
@@ -124,7 +135,7 @@ fun CheckoutScreen(
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
             topBar = {
-                BackTopAppBar(titleResId = R.string.checkout, onNavigateToBack = {})
+                BackTopAppBar(titleResId = R.string.checkout, onNavigateToBack = onNavigateToBack)
             },
             bottomBar = {
                 HorizontalDivider()
@@ -165,7 +176,7 @@ fun CheckoutScreen(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
-                            enabled = uiState.paymentConfigState.paymentItem.label.isNotEmpty()
+                            enabled = payment.label.isNotEmpty()
                         ) {
                             Text(
                                 text = stringResource(id = R.string.pay),
@@ -184,13 +195,6 @@ fun CheckoutScreen(
                 decreaseQuantity = decreaseQuantity,
                 increaseQuantity = increaseQuantity
             )
-        }
-
-        if (uiState.userMessage?.isNotBlank() == true) {
-            LaunchedEffect(uiState.userMessage) {
-                snackBarHostState.showSnackbar(uiState.userMessage)
-                snackBarMessageShown() // Called after snackbar hides
-            }
         }
     }
 }
@@ -331,16 +335,7 @@ fun CheckoutPreview() {
         val snackBarHostState = remember { SnackbarHostState() }
         CheckoutScreen(
             carts = emptyList(),
-            uiState = CheckoutUiState(
-                paymentConfigState = PaymentConfigState(
-                    isLoading = false,
-                    paymentItem = Payment.PaymentItem(
-                        label = "Bank BCA",
-                        image = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png",
-                        status = false
-                    ),
-                )
-            ),
+            uiState = CheckoutUiState(),
             totalPrice = 25000000,
             payment = Payment.PaymentItem(
                 label = "Bank BCA",
@@ -349,7 +344,7 @@ fun CheckoutPreview() {
             ),
             snackBarHostState = snackBarHostState,
             onPaymentTransaction = {},
-            snackBarMessageShown = {},
+            onNavigateToBack = {},
             onNavigateToPayment = {},
             increaseQuantity = {},
             decreaseQuantity = {}

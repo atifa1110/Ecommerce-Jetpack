@@ -11,9 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -38,8 +35,8 @@ fun BottomSheetFilter(
     selectedBrand: String,
     lowestPrice: String,
     highestPrice: String,
-    categoryItems : List<String>,
-    sortItems : List<String>,
+    categoryItems : Array<String>,
+    sortItems : Array<String>,
     isBottomSheetOpen : Boolean,
     setBottomSheetOpen : (Boolean) -> Unit,
     updateSelectedSort : (String) -> Unit,

@@ -1,9 +1,13 @@
 package com.example.ecommerceapp.screen.home
 
+import android.app.Activity
+import android.app.LocaleManager
+import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
+import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,10 +28,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,19 +53,26 @@ fun HomeRoute(
     onToggleTheme : (Boolean) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val languageCode by viewModel.languageCode.collectAsState()
+
     HomeScreen(
         isDarkMode = isDarkMode,
+        languageCode = languageCode,
+        setLanguage = viewModel::setLanguage,
         onNavigateToLogin = {
             viewModel.onLogoutClick()
             onNavigateToLogin()
         },
-        onToggleTheme = onToggleTheme
+        onToggleTheme = onToggleTheme,
+
     )
 }
 
 @Composable
 fun HomeScreen(
     isDarkMode: Boolean,
+    languageCode : String,
+    setLanguage : (String) -> Unit,
     onNavigateToLogin : () -> Unit,
     onToggleTheme : (Boolean) -> Unit,
 ){
@@ -100,9 +111,8 @@ fun HomeScreen(
             )
         }
 
-        val default = AppCompatDelegate.getApplicationLocales()[0]?.language ?: "en"
-        val defaultLanguage = default == "in"
-        val checkedState = rememberSaveable { mutableStateOf(defaultLanguage) }
+        val context = LocalContext.current
+        val isChecked = remember(languageCode) { mutableStateOf(languageCode == "in") }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -116,16 +126,14 @@ fun HomeScreen(
             )
             Switch(
                 modifier = Modifier.padding(horizontal = 10.dp),
-                checked = checkedState.value,
-                onCheckedChange = { isChecked ->
-                    checkedState.value = isChecked
-                    if (checkedState.value) {
-                        val appEnglish: LocaleListCompat = LocaleListCompat.forLanguageTags("in")
-                        AppCompatDelegate.setApplicationLocales(appEnglish)
-                    } else {
-                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
-                        AppCompatDelegate.setApplicationLocales(appLocale)
-                    }
+                checked = isChecked.value,
+                onCheckedChange = { isCheckedNew ->
+                    isChecked.value = isCheckedNew
+                    val newCode = if (isCheckedNew) "in" else "en"
+
+                    // 🔗 Call the unified function that handles system locale + preference saving
+                    setLanguage(context, newCode)
+                    setLanguage(newCode)
                 },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
@@ -155,7 +163,6 @@ fun HomeScreen(
                 modifier = Modifier.padding(horizontal = 10.dp),
                 checked = isDarkMode,
                 onCheckedChange = { isChecked ->
-                    //darkMode.value = isChecked
                     onToggleTheme(isChecked)
                 },
                 colors = SwitchDefaults.colors(
@@ -174,6 +181,16 @@ fun HomeScreen(
     }
 }
 
+fun setLanguage(context: Context, languageCode: String) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.getSystemService(LocaleManager::class.java)
+            .applicationLocales = LocaleList.forLanguageTags(languageCode)
+    } else {
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageCode))
+        (context as? Activity)?.recreate()
+    }
+}
+
 @Preview("Light Mode", device = Devices.PIXEL_3)
 @Preview("Dark Mode", device = Devices.PIXEL_3, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -181,6 +198,8 @@ fun HomePreview(){
     EcommerceAppTheme {
         HomeScreen(
             isDarkMode = false,
+            languageCode = "in",
+            setLanguage = {},
             onNavigateToLogin = {},
             onToggleTheme = {}
         )

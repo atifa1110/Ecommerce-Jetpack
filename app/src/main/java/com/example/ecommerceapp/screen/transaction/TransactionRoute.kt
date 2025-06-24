@@ -23,9 +23,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ecommerceapp.components.ErrorPage
 import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.TransactionListCard
-import com.example.ecommerceapp.data.ui.Transaction
+import com.example.core.ui.model.Transaction
 import com.example.ecommerceapp.R
-import com.example.ecommerceapp.data.ui.ItemTransaction
+import com.example.core.ui.model.ItemTransaction
 import com.example.ecommerceapp.screen.shared.SharedViewModel
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 
@@ -46,6 +46,7 @@ fun TransactionRoute(
         isError = uiState.isError,
         transactions = uiState.transactions,
         onNavigateToStatus = {
+            viewModel.reviewButtonAnalytics()
             sharedViewModel.setTransaction(it)
             onNavigateToStatus()
         }
@@ -74,7 +75,7 @@ fun TransactionScreen(
                     message = stringResource(id = R.string.resource),
                     button = stringResource(R.string.refresh),
                     onButtonClick = { },
-                    alpha = 1F
+                    alpha = 0F
                 )
             }
 

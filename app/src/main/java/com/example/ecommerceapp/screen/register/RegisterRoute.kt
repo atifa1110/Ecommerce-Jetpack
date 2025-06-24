@@ -7,14 +7,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -33,7 +31,9 @@ import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.OutlinedButtonComponent
 import com.example.ecommerceapp.components.PasswordComponent
 import com.example.ecommerceapp.components.TextTermCondition
+import com.example.ecommerceapp.screen.wishlist.WishlistEvent
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RegisterRoute(
@@ -52,9 +52,19 @@ fun RegisterRoute(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is RegisterEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
+
     RegisterScreen(
         uiState = uiState,
-        userMessage = uiState.userMessage?:"",
+        isFormValid = viewModel.isFormValid,
         onEmailChanged = { viewModel.onEmailChange(it) },
         onPasswordChanged = { viewModel.onPasswordChange(it) },
         onNavigateToLogin = onNavigateToLogin,
@@ -63,47 +73,45 @@ fun RegisterRoute(
             viewModel.registerEmailAndPassword()
         },
         snackBarHostState = snackBarHostState,
-        snackBarMessageShown = {viewModel.snackBarMessageShown()}
     )
 }
 
 @Composable
 fun RegisterScreen(
     uiState: RegisterUiState,
-    userMessage : String,
+    isFormValid : Boolean,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onRegisterClick: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    snackBarMessageShown : () -> Unit,
+    loadingContent: @Composable () -> Unit = {
+        LoaderScreen(modifier = Modifier.fillMaxSize())
+    },
     snackBarHostState: SnackbarHostState
 ) {
-    Scaffold(
-        topBar = {
-            CenterTopAppBar(R.string.register)
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        },
-    ) {
-        RegisterContent(
-            modifier = Modifier.padding(it),
-            email = uiState.email,
-            emailError = uiState.emailError?:"",
-            password = uiState.password,
-            passwordError = uiState.passwordError?:"",
-            isLoading = uiState.isLoading,
-            onEmailChanged = onEmailChanged,
-            onPasswordChanged = onPasswordChanged,
-            onNavigateToLogin = onNavigateToLogin,
-            onRegisterClick = onRegisterClick
-        )
-    }
-
-    if (userMessage.isNotBlank()) {
-        LaunchedEffect(userMessage) {
-            snackBarHostState.showSnackbar(userMessage)
-            snackBarMessageShown() // Called after snackbar hides
+    if(uiState.isLoading){
+        loadingContent()
+    }else {
+        Scaffold(
+            topBar = {
+                CenterTopAppBar(R.string.register)
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackBarHostState)
+            },
+        ) {
+            RegisterContent(
+                modifier = Modifier.padding(it),
+                email = uiState.email,
+                emailError = uiState.emailError ?: "",
+                password = uiState.password,
+                passwordError = uiState.passwordError ?: "",
+                isFormValid = isFormValid,
+                onEmailChanged = onEmailChanged,
+                onPasswordChanged = onPasswordChanged,
+                onNavigateToLogin = onNavigateToLogin,
+                onRegisterClick = onRegisterClick
+            )
         }
     }
 }
@@ -115,39 +123,32 @@ fun RegisterContent(
     emailError : String,
     password : String,
     passwordError : String,
-    isLoading : Boolean,
-    loadingContent: @Composable () -> Unit = {
-        LoaderScreen(modifier = Modifier.fillMaxSize())
-    },
+    isFormValid : Boolean,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onRegisterClick: () -> Unit,
     onNavigateToLogin: () -> Unit
 ){
-    if(isLoading){
-        loadingContent()
-    }else {
-        Column(
-            modifier = modifier.background(color = MaterialTheme.colorScheme.background)
-                .fillMaxSize().padding(horizontal = 16.dp, vertical = 32.dp),
-        ) {
-            EmailComponent(email = email, emailError = emailError, onEmailChanged = onEmailChanged)
-            Spacer(modifier = Modifier.height(16.dp))
-            PasswordComponent(
-                password = password,
-                passwordError = passwordError,
-                onPasswordChanged = onPasswordChanged
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            ButtonComponent(
-                onClick = onRegisterClick,
-                enable = emailError.isEmpty() && passwordError.isEmpty(),
-                buttonText = R.string.register
-            )
-            DividerButton(false)
-            OutlinedButtonComponent(onClick = onNavigateToLogin, buttonText = R.string.login)
-            TextTermCondition(false)
-        }
+    Column(
+        modifier = modifier.background(color = MaterialTheme.colorScheme.background)
+            .fillMaxSize().padding(horizontal = 16.dp, vertical = 32.dp),
+    ) {
+        EmailComponent(email = email, emailError = emailError, onEmailChanged = onEmailChanged)
+        Spacer(modifier = Modifier.height(16.dp))
+        PasswordComponent(
+            password = password,
+            passwordError = passwordError,
+            onPasswordChanged = onPasswordChanged
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        ButtonComponent(
+            onClick = onRegisterClick,
+            enable = isFormValid,
+            buttonText = R.string.register
+        )
+        DividerButton(false)
+        OutlinedButtonComponent(onClick = onNavigateToLogin, buttonText = R.string.login)
+        TextTermCondition(false)
     }
 }
 
@@ -164,12 +165,11 @@ fun LoginPreview() {
                 password = "12345678",
                 passwordError = "",
             ),
-            userMessage = "",
+            isFormValid = false,
             onEmailChanged = {},
             onPasswordChanged = {},
             onRegisterClick = {},
             onNavigateToLogin = {},
-            snackBarMessageShown = {},
             snackBarHostState = snackBarHostState,
         )
     }

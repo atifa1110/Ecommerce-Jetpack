@@ -85,11 +85,31 @@
     <string name="time">Waktu</string>
     <string name="Success">Berhasil</string>
     <string name="payment_method">Metode Pembayaran</string>
-    <string name="total_spend">Total Spend</string>
-    <string name="shopping">Shopping</string>
-    <string name="review_buyer">Review Buyer</string>
+    <string name="total_spend">Total Pengeluaran</string>
+    <string name="shopping">Belanja</string>
+    <string name="review_buyer">Ulasan Pembeli</string>
     <plurals name="item_count">
         <item quantity="one">%d barang</item>
         <item quantity="other">%d barang</item>
     </plurals>
+    <string name="default_notification_channel_id">1</string>
+    <string name="request_notification_permission">Minta izin</string>
+    <string name="notification_permission_title">Izin notifikasi</string>
+    <string name="notification_permission_description">Izin notifikasi penting untuk aplikasi ini. Mohon berikan izinnya.</string>
+    <string name="notification_permission_settings">Izin notifikasi penting untuk aplikasi ini. Silakan buka pengaturan perangkat Anda dan aktifkan notifikasi untuk Make it So.</string>
+    <string name="notification">Notifikasi</string>
+    <string name="ok">Ok</string>
+    <string-array name="category_items">
+        <item>Apple</item>
+        <item>Asus</item>
+        <item>Dell</item>
+        <item>Lenovo</item>
+    </string-array>
+
+    <string-array name="sort_items">
+        <item>Ulasan</item>
+        <item>Penjualan</item>
+        <item>Harga Terendah</item>
+        <item>Harga Tertinggi</item>
+    </string-array>
 </resources>

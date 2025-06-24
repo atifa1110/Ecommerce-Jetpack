@@ -3,7 +3,11 @@ package com.example.ecommerceapp.screen.store
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.example.ecommerceapp.data.network.response.EcommerceResponse
+import com.example.core.data.network.response.EcommerceResponse
+import com.example.ecommerceapp.firebase.ProductAnalyticsManager
+import com.example.core.domain.usecase.GetProductFilterUseCase
+import com.example.core.domain.usecase.GetSearchProductUseCase
+import com.example.core.domain.usecase.RefreshTokenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +20,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class StoreUiState(
+    val isLoading: Boolean = false,
     val isClickedGrid: Boolean = false,
     val isSearchOpen: Boolean = false,
     val isBottomSheetOpen: Boolean = false,
@@ -31,6 +36,8 @@ data class StoreUiState(
 data class SearchSuggestionState(
     val suggestions: List<String> = emptyList(),
     val isLoading: Boolean = false,
+    val isSuccess: Boolean = false,
+    val isError : Boolean = false
 )
 
 data class ProductFilter(
@@ -54,35 +61,35 @@ val ProductFilter.activeFilter: List<String>
 class StoreViewModel @Inject constructor(
     private val getProductFilterUseCase: GetProductFilterUseCase,
     private val getSearchProductUseCase: GetSearchProductUseCase,
-    private val refreshTokenUseCase: RefreshTokenUseCase
+    private val refreshTokenUseCase: RefreshTokenUseCase,
+    private val productAnalyticsManager: ProductAnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StoreUiState())
     val uiState: StateFlow<StoreUiState> = _uiState
 
-    val categoryItems = listOf("Apple", "Asus", "Dell", "Lenovo")
-    val sortItems = listOf("Ulasan", "Penjualan", "Harga Terendah", "Harga Tertinggi")
-
-    fun refreshToken() = viewModelScope.launch {
+    fun refreshToken(onSuccess: () -> Unit) = viewModelScope.launch {
         refreshTokenUseCase.invoke().collect { result ->
-            when(result){
-                is EcommerceResponse.Failure -> {
+            when (result) {
+                is EcommerceResponse.Success -> {
                     _uiState.update {
-                        it.copy(userMessage = result.error)
-                    }
-                }
-                EcommerceResponse.Loading -> {
-                    _uiState.update {
-                        it.copy(userMessage = null)
-                    }
-                }
-                is EcommerceResponse.Success-> {
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            // assign copy to emit a new object
-                            productFilter = currentState.productFilter.copy()
+                        it.copy(
+                            isLoading = false,
+                            userMessage = result.value,
+                            productFilter = it.productFilter.copy()
                         )
                     }
+                    onSuccess()
+                }
+
+                is EcommerceResponse.Failure -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, userMessage = result.error)
+                    }
+                }
+
+                is EcommerceResponse.Loading -> {
+                    _uiState.update { it.copy(isLoading = true, userMessage = null) }
                 }
             }
         }
@@ -97,10 +104,16 @@ class StoreViewModel @Inject constructor(
                 searchSuggestionState = SearchSuggestionState() // reset suggestions
             )
         }
+        productAnalyticsManager.trackSearchSuggestionSelected(suggestion)
     }
 
     fun setSearchScreenOpen(open: Boolean) {
         _uiState.update { it.copy(isSearchOpen = open) }
+        if (open) {
+            productAnalyticsManager.trackSearchScreenViewed()
+        } else {
+            productAnalyticsManager.trackSearchScreenClosed()
+        }
     }
 
     fun setBottomSheetOpen(open: Boolean) {
@@ -144,9 +157,7 @@ class StoreViewModel @Inject constructor(
 
     fun toggleClickedGrid() {
         _uiState.update { current ->
-            current.copy(
-                isClickedGrid = !current.isClickedGrid
-            )
+            current.copy(isClickedGrid = !current.isClickedGrid)
         }
     }
 
@@ -157,6 +168,7 @@ class StoreViewModel @Inject constructor(
     }
 
     fun setQuery(brand: String?, lowest: String?, highest: String?, sort: String?) {
+        productAnalyticsManager.trackFilterButtonClicked()
         _uiState.update {
             it.copy(
                 productFilter = it.productFilter.copy(
@@ -167,9 +179,19 @@ class StoreViewModel @Inject constructor(
                 )
             )
         }
+
+        val updatedFilter = uiState.value.productFilter
+        val activeFilters = updatedFilter.activeFilter
+
+        productAnalyticsManager.trackApplyFilter(
+            filterType = activeFilters.joinToString(","),
+            filterValue = activeFilters.joinToString(","),
+            productListContext = "store_main_list"
+        )
     }
 
     fun resetQuery() {
+        productAnalyticsManager.trackFilterResetButtonClicked()
         _uiState.update {
             it.copy(productFilter = ProductFilter())
         }
@@ -189,14 +211,16 @@ class StoreViewModel @Inject constructor(
             )
         }.cachedIn(viewModelScope)
 
-    fun searchProduct() = viewModelScope.launch {
-        getSearchProductUseCase.invoke(uiState.value.productFilter.search ?: "")
+    fun fetchSearchSuggestions() = viewModelScope.launch {
+        productAnalyticsManager.trackSearchButtonClicked()
+        val search = uiState.value.productFilter.search ?: ""
+        getSearchProductUseCase.invoke(search)
             .collect { result ->
                 when (result) {
                     EcommerceResponse.Loading -> {
                         _uiState.update {
                             it.copy(
-                                searchSuggestionState = it.searchSuggestionState.copy(isLoading = true)
+                                searchSuggestionState = it.searchSuggestionState.copy(isLoading = true, isError = false, isSuccess = false)
                             )
                         }
                     }
@@ -207,9 +231,12 @@ class StoreViewModel @Inject constructor(
                                 userMessage = result.error,
                                 searchSuggestionState = it.searchSuggestionState.copy(
                                     isLoading = false,
+                                    isSuccess = false,
+                                    isError = true
                                 )
                             )
                         }
+                        productAnalyticsManager.trackSearchFailed(search,result.error)
                     }
                     is EcommerceResponse.Success -> {
                         _uiState.update {
@@ -217,9 +244,14 @@ class StoreViewModel @Inject constructor(
                                 searchSuggestionState = it.searchSuggestionState.copy(
                                     suggestions = result.value,
                                     isLoading = false,
+                                    isError = false,
+                                    isSuccess = true,
                                 )
                             )
                         }
+
+                        productAnalyticsManager.trackSearchSuccess(search, result.value.size)
+                        productAnalyticsManager.trackViewSearchResults(search, result.value)
                     }
                 }
             }

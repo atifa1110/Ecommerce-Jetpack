@@ -40,8 +40,7 @@ import com.example.ecommerceapp.components.BackTopAppBar
 import com.example.ecommerceapp.components.CartListCard
 import com.example.ecommerceapp.components.ErrorPage
 import com.example.ecommerceapp.components.LoaderScreen
-import com.example.ecommerceapp.data.ui.Cart
-import com.example.ecommerceapp.screen.checkout.CheckoutViewModel
+import com.example.core.ui.model.Cart
 import com.example.ecommerceapp.screen.shared.SharedViewModel
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 import com.example.ecommerceapp.utils.currency
@@ -68,12 +67,12 @@ fun CartRoute(
         onNavigateToBack = onNavigateToBack,
         isButtonVisible = isAnyChecked,
         isAllChecked = isAllChecked,
-        selectAll = viewModel::selectAll,
-        clearSelection = viewModel::clearSelection,
+        selectAll = {viewModel.setAllChecked(true)},
+        clearSelection = {viewModel.setAllChecked(false)},
         toggleItemCheck = viewModel::toggleItemChecked,
         totalCheckedPrice = totalCheckedPrice,
-        increaseQuantity = viewModel::increaseQuantity,
-        decreaseQuantity = viewModel::decreaseQuantity,
+        increaseQuantity = { viewModel.updateQuantity(it,true) },
+        decreaseQuantity = { viewModel.updateQuantity(it,false) },
         deleteCheckedItem = viewModel::deleteCheckedItems,
         deleteCartItem = viewModel::deleteCartItem,
         setCheckedCartItems = {
@@ -154,7 +153,6 @@ fun CartScreen(
     ) {
         CartContent(
             modifier = Modifier.padding(it),
-            onNavigateToBack = onNavigateToBack,
             isButtonVisible = isButtonVisible,
             isAllChecked = isAllChecked,
             isLoading = uiState.isLoading,
@@ -173,7 +171,6 @@ fun CartScreen(
 @Composable
 fun CartContent(
     modifier : Modifier,
-    onNavigateToBack: () -> Unit,
     isAllChecked : Boolean,
     isLoading: Boolean,
     isButtonVisible: Boolean,

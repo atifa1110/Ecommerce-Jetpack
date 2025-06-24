@@ -30,6 +30,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -44,25 +46,23 @@ import androidx.compose.ui.unit.dp
 import com.example.ecommerceapp.R
 import com.example.ecommerceapp.components.SearchCard
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun SearchScreen(
+    uiState: SearchSuggestionState,
     search: String,
     onSearchChange: (String) -> Unit,
     searchProduct: () -> Unit,
     setSearchScreenOpen: (Boolean) -> Unit,
-    results: List<String>,
-    isLoading: Boolean,
     errorMessage: String?,
     onSuggestionSelected: (String) -> Unit
 ) {
     val visible by remember { mutableStateOf(true) }
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
 
     AnimatedVisibility(
         visible = visible,
@@ -121,11 +121,17 @@ fun SearchScreen(
             )
 
             when {
-                isLoading -> {
+                uiState.isLoading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
                             color = MaterialTheme.colorScheme.primary
                         )
+                    }
+                }
+
+                errorMessage == null && search.isNotBlank() && uiState.isSuccess && uiState.suggestions.isEmpty() -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Search is Empty")
                     }
                 }
 
@@ -141,7 +147,7 @@ fun SearchScreen(
 
                 else -> {
                     LazyColumn {
-                        itemsIndexed(results) { index, item ->
+                        itemsIndexed(uiState.suggestions) { index, item ->
                             key(index) {
                                 SearchCard(
                                     productName= item,
@@ -164,20 +170,22 @@ fun SearchScreen(
 fun LoginPreview() {
     EcommerceAppTheme {
         SearchScreen(
+            uiState = SearchSuggestionState(
+                suggestions = listOf(
+                    "Lenovo Legion 3",
+                    "Lenovo Legion 5",
+                    "Lenovo Legion 7",
+                    "Lenovo Ideapad 3",
+                    "Lenovo Ideapad 5",
+                    "Lenovo Ideapad 7"
+                ),
+                isLoading = false,
+            ),
             search = "Lenovo",
             onSearchChange = {},
             setSearchScreenOpen = {},
             onSuggestionSelected = {},
             searchProduct = {},
-            results = listOf(
-                "Lenovo Legion 3",
-                "Lenovo Legion 5",
-                "Lenovo Legion 7",
-                "Lenovo Ideapad 3",
-                "Lenovo Ideapad 5",
-                "Lenovo Ideapad 7"
-            ),
-            isLoading = false,
             errorMessage = ""
         )
     }

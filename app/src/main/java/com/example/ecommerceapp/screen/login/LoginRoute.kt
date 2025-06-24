@@ -31,7 +31,9 @@ import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.OutlinedButtonComponent
 import com.example.ecommerceapp.components.PasswordComponent
 import com.example.ecommerceapp.components.TextTermCondition
+import com.example.ecommerceapp.screen.register.RegisterEvent
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginRoute(
@@ -46,12 +48,24 @@ fun LoginRoute(
     // 🔁 Navigate when login is successful
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
+            viewModel.updateFcmToken()
             onNavigateToHome()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is LoginEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+            }
         }
     }
 
     LoginScreen(
         uiState = uiState,
+        isFormValid = viewModel.isFormValid,
         onEmailChanged = {viewModel.onEmailChange(it)},
         onPasswordChanged = {viewModel.onPasswordChange(it)},
         onLoginClick = {
@@ -59,7 +73,6 @@ fun LoginRoute(
             viewModel.loginEmailAndPassword()
         },
         onNavigateToRegister = onNavigateToRegister,
-        snackBarMessageShown = { viewModel.snackBarMessageShown() },
         snackBarHostState = snackBarHostState
     )
 }
@@ -67,41 +80,41 @@ fun LoginRoute(
 @Composable
 fun LoginScreen(
     uiState: LoginUiState,
+    isFormValid : Boolean,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onLoginClick : () -> Unit,
     onNavigateToRegister: () -> Unit,
-    snackBarMessageShown : () -> Unit,
+    loadingContent: @Composable () -> Unit = {
+        LoaderScreen(modifier = Modifier.fillMaxSize())
+    },
     snackBarHostState: SnackbarHostState
 ) {
-    Scaffold(
-        topBar = {
-            CenterTopAppBar(R.string.login)
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        },
-    ) {
-        LoginContent(
-            modifier = Modifier.padding(it),
-            email = uiState.email,
-            emailError = uiState.emailError?:"",
-            password = uiState.password,
-            passwordError = uiState.passwordError?:"",
-            isLoading = uiState.isLoading,
-            onEmailChanged = onEmailChanged,
-            onPasswordChanged = onPasswordChanged,
-            onLoginClick = onLoginClick,
-            onNavigateToRegister = onNavigateToRegister
-        )
-    }
-    if (uiState.userMessage?.isNotBlank() == true) {
-        LaunchedEffect(uiState.userMessage) {
-            snackBarHostState.showSnackbar(uiState.userMessage)
-            snackBarMessageShown() // Called after snackbar hides
+    if(uiState.isLoading){
+        loadingContent()
+    }else {
+        Scaffold(
+            topBar = {
+                CenterTopAppBar(R.string.login)
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackBarHostState)
+            },
+        ) {
+            LoginContent(
+                modifier = Modifier.padding(it),
+                email = uiState.email,
+                emailError = uiState.emailError ?: "",
+                password = uiState.password,
+                passwordError = uiState.passwordError ?: "",
+                isFormValid = isFormValid,
+                onEmailChanged = onEmailChanged,
+                onPasswordChanged = onPasswordChanged,
+                onLoginClick = onLoginClick,
+                onNavigateToRegister = onNavigateToRegister
+            )
         }
     }
-
 }
 
 @Composable
@@ -111,40 +124,33 @@ fun LoginContent(
     emailError : String,
     password : String,
     passwordError : String,
-    isLoading: Boolean,
-    loadingContent: @Composable () -> Unit = {
-        LoaderScreen(modifier = Modifier.fillMaxSize())
-    },
+    isFormValid : Boolean,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onLoginClick: () -> Unit,
     onNavigateToRegister: () -> Unit,
 ){
-    if(isLoading){
-        loadingContent()
-    } else {
-        Column(
-            modifier = modifier.background(color = MaterialTheme.colorScheme.background)
-                .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 32.dp),
-        ) {
-            EmailComponent(email = email, emailError = emailError, onEmailChanged = onEmailChanged)
-            Spacer(modifier = Modifier.height(16.dp))
-            PasswordComponent(
-                password = password,
-                passwordError = passwordError,
-                onPasswordChanged = onPasswordChanged
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            ButtonComponent(
-                onClick = onLoginClick,
-                enable = emailError.isEmpty() && passwordError.isEmpty(),
-                buttonText = R.string.login
-            )
-            DividerButton(true)
-            OutlinedButtonComponent(onClick = onNavigateToRegister, buttonText = R.string.register)
-            TextTermCondition(true)
-        }
+    Column(
+        modifier = modifier.background(color = MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 32.dp),
+    ) {
+        EmailComponent(email = email, emailError = emailError, onEmailChanged = onEmailChanged)
+        Spacer(modifier = Modifier.height(16.dp))
+        PasswordComponent(
+            password = password,
+            passwordError = passwordError,
+            onPasswordChanged = onPasswordChanged
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        ButtonComponent(
+            onClick = onLoginClick,
+            enable = isFormValid,
+            buttonText = R.string.login
+        )
+        DividerButton(true)
+        OutlinedButtonComponent(onClick = onNavigateToRegister, buttonText = R.string.register)
+        TextTermCondition(true)
     }
 }
 
@@ -162,10 +168,10 @@ fun LoginPreview() {
                 emailError = "",
                 isLoading = false
             ),
+            isFormValid = false,
             onEmailChanged = {},
             onPasswordChanged = {},
             onLoginClick = {},
-            snackBarMessageShown = {},
             snackBarHostState = snackBarHostState,
             onNavigateToRegister = {}
         )

@@ -29,11 +29,14 @@ object ReviewDestination : EcommerceNavigationDestination {
 }
 
 fun NavGraphBuilder.reviewGraph(
+    onNavigateToBack: () -> Unit,
 ) = composable(
     route = ReviewDestination.routeWithArguments,
     arguments = listOf(
         navArgument(DetailsDestination.idArgument) { type = NavType.StringType },
     )
 ) {
-    ReviewRoute()
+    ReviewRoute(
+        onNavigateToBack = onNavigateToBack
+    )
 }

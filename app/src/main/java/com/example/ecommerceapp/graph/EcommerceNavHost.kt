@@ -4,12 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import kotlin.text.set
 
 @Composable
 fun EcommerceNavHost (
     navController: NavHostController,
-    startDestination: EcommerceNavigationDestination,
+    isNotification : String?,
+    startDestination: String,
     isDarkMode : Boolean,
     onBackButtonClick: () -> Unit,
     onShowMessage: (String) -> Unit,
@@ -19,44 +19,32 @@ fun EcommerceNavHost (
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = startDestination.route,
-        route = "root_graph"
+        startDestination = startDestination,
     ) {
-        splashGraph(
-            onNavigateToLogin = {
-                navController.navigate(LoginDestination.route) {
-                    popUpTo(SplashDestination.route) { inclusive = true }
-                }
-            },
-            onNavigateToProfile = {
-                navController.navigate(ProfileDestination.route) {
-                    popUpTo(SplashDestination.route) { inclusive = true }
-                }
-            },
-            onNavigateToHome = {
-                navController.navigate(MainDestination.route) {
-                    popUpTo(SplashDestination.route) { inclusive = true }
-                }
-            },
-            onNavigateToBoarding = {
-                navController.navigate(OnBoardingDestination.route) {
-                    popUpTo(SplashDestination.route) { inclusive = true }
-                }
-            }
-        )
-
         boardingGraph (
             onNavigateToRegister = {
-                navController.navigate(RegisterDestination.route)
+                navController.navigate(RegisterDestination.route){
+                    popUpTo(OnBoardingDestination.route) {
+                        inclusive = true
+                    }
+                }
             },
             onNavigateToLogin = {
-                navController.navigate(LoginDestination.route)
+                navController.navigate(LoginDestination.route){
+                    popUpTo(OnBoardingDestination.route) {
+                        inclusive = true
+                    }
+                }
             }
         )
 
         loginGraph (
-            onNavigateToRegister = {navController.navigate(RegisterDestination.route)},
-            onNavigateToHome = {navController.navigate(MainDestination.route)}
+            onNavigateToRegister = {
+                navController.navigate(RegisterDestination.route)
+            },
+            onNavigateToHome = {
+                navController.navigate(MainDestination.route)
+            }
         )
 
         registerGraph(
@@ -85,7 +73,17 @@ fun EcommerceNavHost (
                 navController.navigate(CartDestination.route)
             },
             onNavigateToStatus = {
-                navController.navigate(StatusDestination.route) {
+                navController.navigate(StatusDestination.route)
+            },
+            onNavigateToNotification = {
+                navController.navigate(NotificationDestination.route) {
+                    popUpTo(MainDestination.route) {
+                        inclusive = false
+                    }
+                }
+            },
+            onNavigateToModular = {
+                navController.navigate(ModularDestination.route) {
                     popUpTo(MainDestination.route) {
                         inclusive = false
                     }
@@ -94,7 +92,7 @@ fun EcommerceNavHost (
         )
 
         detailsGraph(
-            onBackButtonClick = {},
+            onBackButtonClick = onBackButtonClick,
             onShowMessage = {},
             onNavigateToCheckout = {
                 navController.navigate(CheckoutDestination.route)
@@ -104,18 +102,23 @@ fun EcommerceNavHost (
             }
         )
 
-        reviewGraph()
+        reviewGraph(
+            onNavigateToBack = onBackButtonClick
+        )
 
         cartGraph(
             onNavigateToCheckout = {
                 navController.navigate(CheckoutDestination.route)
             },
-            onNavigateToBack = {}
+            onNavigateToBack = onBackButtonClick
         )
 
         checkoutGraph(
+            onNavigateToBack = onBackButtonClick,
             onNavigateToStatus = {
-                navController.navigate(StatusDestination.route)
+                navController.navigate(StatusDestination.route) {
+                    popUpTo(CartDestination.route) { inclusive = true } // Remove checkout
+                }
             },
             onNavigateToPayment = {
                 navController.navigate(PaymentDestination.route)
@@ -123,7 +126,7 @@ fun EcommerceNavHost (
         )
 
         paymentGraph (
-            onNavigateToBack = {},
+            onNavigateToBack = onBackButtonClick,
             onItemClick = { paymentItem ->
                 navController
                     .previousBackStackEntry
@@ -135,11 +138,33 @@ fun EcommerceNavHost (
 
         statusGraph (
             onNavigateToTransaction = {
-                navController.navigate(MainDestination.route) {
-                    popUpTo(StatusDestination.route) { inclusive = true } // Or adjust depending on back stack
+                //set bottom navigation to transaction
+                navController.navigate(MainDestination.createRouteWithTab(MainLevelDestination.Transaction.route)) {
+                    popUpTo(StatusDestination.route) { inclusive = true }
                 }
             },
-            onBackButton = {navController.popBackStack() },
+            onBackButton = {
+                //set bottom navigation to transaction
+                navController.navigate(MainDestination.createRouteWithTab(MainLevelDestination.Transaction.route)) {
+                    popUpTo(StatusDestination.route) { inclusive = true }
+                }
+            },
+        )
+
+        notificationGraph(
+            isNotification = isNotification,
+            onNavigationToMain = {
+                navController.navigate(MainDestination.route){
+                    popUpTo(NotificationDestination.route){
+                        inclusive = true
+                    }
+                }
+            },
+            onNavigationBack = onBackButtonClick
+        )
+
+        modularGraph(
+            onNavigateToBack = onBackButtonClick
         )
     }
 }

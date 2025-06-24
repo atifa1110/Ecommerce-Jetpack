@@ -2,9 +2,11 @@ package com.example.ecommerceapp.screen.transaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ecommerceapp.data.network.response.EcommerceResponse
-import com.example.ecommerceapp.data.ui.Transaction
-import com.example.ecommerceapp.data.ui.mapper.asTransaction
+import com.example.core.data.network.response.EcommerceResponse
+import com.example.core.ui.model.Transaction
+import com.example.core.ui.mapper.asTransaction
+import com.example.ecommerceapp.firebase.StatusAnalytics
+import com.example.core.domain.usecase.GetTransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,15 +19,17 @@ data class TransactionUiState(
     val isError : Boolean = false,
     val isSuccess : Boolean = false,
     val transactions: List<Transaction> = emptyList(),
-    val userMessage : String? = null
 )
 
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
-    private val transactionUseCase: GetTransactionUseCase
+    private val transactionUseCase: GetTransactionUseCase,
+    private val statusAnalytics: StatusAnalytics
 ) : ViewModel(){
     private val _uiState = MutableStateFlow(TransactionUiState())
     val uiState: StateFlow<TransactionUiState> = _uiState
+
+    fun reviewButtonAnalytics () = statusAnalytics.trackReviewButtonClicked()
 
     fun getTransaction() = viewModelScope.launch {
         transactionUseCase.invoke().collect { result ->
@@ -33,10 +37,10 @@ class TransactionViewModel @Inject constructor(
                 is EcommerceResponse.Failure -> {
                     _uiState.update {
                         it.copy(
-                            isLoading = false,     // Stop loading
+                            isLoading = false,
                             isError = true,
-                            isSuccess = false,
-                            userMessage = result.error)
+                            isSuccess = false
+                        )
                     }
                 }
                 EcommerceResponse.Loading -> {
@@ -51,7 +55,7 @@ class TransactionViewModel @Inject constructor(
                 is EcommerceResponse.Success -> {
                     _uiState.update {
                         it.copy(
-                            isLoading = false,     // Stop loading
+                            isLoading = false,
                             isError = false,
                             isSuccess = true,
                             transactions = result.value.map { it.asTransaction() })

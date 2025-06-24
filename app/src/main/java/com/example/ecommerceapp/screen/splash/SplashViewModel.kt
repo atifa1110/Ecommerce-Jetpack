@@ -2,16 +2,21 @@ package com.example.ecommerceapp.screen.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ecommerceapp.screen.home.ClearAppStateUseCase
-import com.example.ecommerceapp.screen.home.ClearAuthTokenUseCase
-import com.example.ecommerceapp.screen.home.ClearUserDataUseCase
+import com.example.core.domain.usecase.GetBoardingStateUseCase
+import com.example.core.domain.usecase.GetDarkStateUseCase
+import com.example.core.domain.usecase.GetLoginStateUseCase
+import com.example.core.domain.usecase.GetProfileStateUseCase
+import com.example.core.domain.usecase.GetRegisterStateUseCase
+import com.example.core.domain.usecase.SetDarkStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
@@ -19,19 +24,34 @@ class SplashViewModel @Inject constructor(
     private val getRegisterStateUseCase: GetRegisterStateUseCase,
     private val getProfileStateUseCase: GetProfileStateUseCase,
     private val getLoginStateUseCase: GetLoginStateUseCase,
-    private val clearUserDataUseCase: ClearUserDataUseCase,
-    private val clearAuthTokenUseCase: ClearAuthTokenUseCase,
-    private val clearAppStateUseCase: ClearAppStateUseCase
+    private val getDarkStateUseCase: GetDarkStateUseCase,
+    private val setDarkStateUseCase: SetDarkStateUseCase,
 ) : ViewModel(){
 
-    val onBoardingState = getBoardingStateUseCase.invoke()
-    val onLoginState = getLoginStateUseCase.invoke()
-    val onProfileState = getProfileStateUseCase.invoke()
-    val onRegisterStateUseCase = getRegisterStateUseCase.invoke()
+    val onBoardingState = getBoardingStateUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val onLoginState = getLoginStateUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val onProfileState = getProfileStateUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val onRegisterStateUseCase = getRegisterStateUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val isDarkMode = getDarkStateUseCase()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    fun clearUserData () = viewModelScope.launch {
-        clearUserDataUseCase.invoke()
-        clearAuthTokenUseCase.invoke()
-        clearAppStateUseCase.invoke()
+    fun toggleDarkMode(enabled: Boolean) {
+        viewModelScope.launch {
+            setDarkStateUseCase.invoke(enabled)
+        }
+    }
+
+    private val _isLoadingComplete = MutableStateFlow(false)
+    val isLoadingComplete: StateFlow<Boolean> = _isLoadingComplete.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            delay(100L)
+            _isLoadingComplete.value = true
+        }
     }
 }

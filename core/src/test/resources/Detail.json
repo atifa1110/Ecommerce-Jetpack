@@ -1,0 +1,33 @@
+{
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "productId": "b774d021-250a-4c3a-9c58-ab39edb36de5",
+    "productName": "Dell",
+    "productPrice": 13849000,
+    "image": [
+      "image1",
+      "image2",
+      "image3"
+    ],
+    "brand": "Dell",
+    "description": "DELL",
+    "store": "DellStore",
+    "sale": 13,
+    "stock": 44,
+    "totalRating": 10,
+    "totalReview": 5,
+    "totalSatisfaction": 100,
+    "productRating": 5.0,
+    "productVariant": [
+      {
+        "variantName": "RAM 16GB",
+        "variantPrice": 0
+      },
+      {
+        "variantName": "RAM 32GB",
+        "variantPrice": 1000000
+      }
+    ]
+  }
+}

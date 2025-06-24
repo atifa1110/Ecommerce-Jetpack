@@ -3,9 +3,11 @@ package com.example.ecommerceapp.di
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.example.ecommerceapp.data.network.api.AuthApiService
-import com.example.ecommerceapp.data.network.api.PaymentApiService
-import com.example.ecommerceapp.data.network.api.ProductApiService
+import com.example.ecommerceapp.BuildConfig
+import com.example.core.data.network.api.AuthApiService
+import com.example.core.data.network.api.FirebaseApiService
+import com.example.core.data.network.api.PaymentApiService
+import com.example.core.data.network.api.ProductApiService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -69,7 +71,7 @@ object NetworkModule {
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.100.13:5000/")
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -92,4 +94,11 @@ object NetworkModule {
     fun providePaymentService(retrofit: Retrofit): PaymentApiService {
         return retrofit.create(PaymentApiService::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideFirebaseService(retrofit: Retrofit): FirebaseApiService {
+        return retrofit.create(FirebaseApiService::class.java)
+    }
+
 }

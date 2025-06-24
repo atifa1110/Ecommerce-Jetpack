@@ -82,29 +82,15 @@ fun MainTopAppBar(
                 IconButton(onClick = { /* your logic */ }) {
                     Box(
                         modifier = Modifier
-                            .size(40.dp) // total size of the IconButton
+                            .size(24.dp) // total size of the IconButton
                             .clip(CircleShape)
                     ) {
-                        if (image.isEmpty()) {
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = "account_profile",
-                                modifier = Modifier
-                                    .fillMaxSize()
-                            )
-                        } else {
-                            AsyncImage(
-                                model = image,
-                                contentDescription = "User image",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape)
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "account_profile",
+                            modifier = Modifier.fillMaxSize())
                     }
                 }
-
             },
             actions = {
                 IconButton(

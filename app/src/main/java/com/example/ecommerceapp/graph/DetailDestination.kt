@@ -40,6 +40,7 @@ fun NavGraphBuilder.detailsGraph(
     )
 ) {
     DetailRoute(
+        onNavigateToBack  = onBackButtonClick,
         onNavigateToCheckout = onNavigateToCheckout,
         onNavigateToReview = onNavigateToReview
     )

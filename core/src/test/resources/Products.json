@@ -1,0 +1,22 @@
+{
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "itemsPerPage": 10,
+    "currentItemCount": 4,
+    "pageIndex": 1,
+    "totalPages": 1,
+    "items": [
+      {
+        "productId": "1",
+        "productName": "Product 1",
+        "productPrice": 13849000,
+        "image": "images",
+        "brand": "Dell",
+        "store": "DellStore",
+        "sale": 13,
+        "productRating": 5.0
+      }
+    ]
+  }
+}

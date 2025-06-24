@@ -19,8 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.core.data.network.response.PagingError
 import com.example.ecommerceapp.R
-import com.example.ecommerceapp.data.network.response.PagingError
 
 data class ErrorUI(
     val title: String,
@@ -42,7 +42,10 @@ fun ErrorStateUI(
                 title = stringResource(id = R.string.empty),
                 message = stringResource(id = R.string.resource),
                 buttonRes = stringResource(id = R.string.reset),
-                onClick = { onResetQuery(); onRefreshAnalytics() }
+                onClick = {
+                    onResetQuery()
+                    onRefreshAnalytics()
+                }
             )
             500 -> ErrorUI(
                 title = error.code.toString(),
@@ -54,7 +57,9 @@ fun ErrorStateUI(
                 title = stringResource(id = R.string.connection),
                 message = stringResource(id = R.string.connection_unavailable),
                 buttonRes = stringResource(id = R.string.refresh),
-                onClick = { onRefreshAnalytics(); onRefreshToken() }
+                onClick = {
+                    onRefreshToken()
+                }
             )
             else -> return
         }
@@ -63,7 +68,7 @@ fun ErrorStateUI(
             title = stringResource(id = R.string.connection),
             message = stringResource(id = R.string.connection_unavailable),
             buttonRes = stringResource(id = R.string.refresh),
-            onClick = { onRefreshToken(); onRefreshAnalytics() }
+            onClick = { onRefreshToken() }
         )
 
         is PagingError.NotFoundError -> ErrorUI(

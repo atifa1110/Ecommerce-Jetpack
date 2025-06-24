@@ -2,7 +2,7 @@ package com.example.ecommerceapp.graph
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.ecommerceapp.data.ui.Payment
+import com.example.core.ui.model.Payment
 import com.example.ecommerceapp.screen.payment.PaymentRoute
 
 object PaymentDestination : EcommerceNavigationDestination {

@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 @Composable
 fun BottomNavHost(
     navController: NavHostController,
-    startDestination: EcommerceNavigationDestination,
+    startDestination: String,
     isDarkMode : Boolean,
     onNavigateToDetail : (String) -> Unit,
     onNavigateToStatus : () -> Unit,
@@ -19,7 +19,7 @@ fun BottomNavHost(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = startDestination.route
+        startDestination = startDestination
     ) {
         homeGraph(
             isDarkMode = isDarkMode,

@@ -44,16 +44,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
 import com.example.ecommerceapp.R
 import com.example.ecommerceapp.components.BasicAlert
 import com.example.ecommerceapp.components.ButtonComponent
 import com.example.ecommerceapp.components.CenterTopAppBar
+import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.TextComponent
 import com.example.ecommerceapp.components.TextTermCondition
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 import com.example.ecommerceapp.utils.rememberImageBitmapFromUri
 import com.example.ecommerceapp.utils.uriToFile
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,9 +102,9 @@ fun ProfileRoute(
 
     BasicAlert(
         openDialog = uiState.showImageDialog,
-        onDismiss = {viewModel.hideDialog()},
+        onDismiss = {viewModel.showDialog(false)},
         onLaunchCamera = {
-            viewModel.hideDialog()
+            viewModel.showDialog(false)
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED
             ) {
@@ -115,10 +116,20 @@ fun ProfileRoute(
             }
         },
         onLaunchGallery = {
-            viewModel.hideDialog()
+            viewModel.showDialog(false)
             launcherGallery.launch("image/*")
         }
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is ProfileEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
 
     // 🔁 Navigate when login is successful
     LaunchedEffect(uiState.isSuccess) {
@@ -129,13 +140,12 @@ fun ProfileRoute(
 
     ProfileScreen (
         uiState = uiState,
-        onImageClick = { viewModel.showDialog() },
+        onImageClick = { viewModel.showDialog(true) },
         onUploadClick = {
             keyboardController?.hide()
             viewModel.onSetProfileClick()
         },
         onNameChange = { viewModel.setUserName(it)},
-        snackBarMessageShown = { viewModel.snackBarMessageShown() },
         snackBarHostState = snackBarHostState
     )
 }
@@ -146,30 +156,30 @@ fun ProfileScreen(
     onImageClick: () -> Unit,
     onUploadClick: () -> Unit,
     onNameChange: (String) -> Unit,
-    snackBarMessageShown : () -> Unit,
+    loadingContent: @Composable () -> Unit = {
+        LoaderScreen(modifier = Modifier.fillMaxSize())
+    },
     snackBarHostState: SnackbarHostState
 ) {
-    Scaffold(
-        topBar = {
-            CenterTopAppBar(R.string.profile)
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        },
-    ) {
-        ProfileContent(
-            name = uiState.userName,
-            imageUri = uiState.imageUri,
-            modifier = Modifier.padding(it),
-            onImageClick = onImageClick,
-            onNameChange = onNameChange,
-            onUploadClick = onUploadClick
-        )
-    }
-    if (!uiState.userMessage.isNullOrBlank()) {
-        LaunchedEffect(uiState.userMessage) {
-            snackBarHostState.showSnackbar(uiState.userMessage)
-            snackBarMessageShown() // Called after snackbar hides
+    if(uiState.isLoading){
+        loadingContent()
+    }else {
+        Scaffold(
+            topBar = {
+                CenterTopAppBar(R.string.profile)
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackBarHostState)
+            },
+        ) {
+            ProfileContent(
+                name = uiState.userName,
+                imageUri = uiState.imageUri,
+                modifier = Modifier.padding(it),
+                onImageClick = onImageClick,
+                onNameChange = onNameChange,
+                onUploadClick = onUploadClick
+            )
         }
     }
 }
@@ -217,7 +227,7 @@ fun ProfileContent(
         }
 
         TextComponent(text = name, onTextChanged = onNameChange, label = R.string.name)
-        ButtonComponent(onClick = onUploadClick, enable = true, buttonText = R.string.done)
+        ButtonComponent(onClick = onUploadClick, enable = name.isNotEmpty(), buttonText = R.string.done)
         TextTermCondition(false)
     }
 }
@@ -236,7 +246,6 @@ fun ProfilePreview() {
             onNameChange = {},
             onUploadClick = {},
             onImageClick = {},
-            snackBarMessageShown = {},
             snackBarHostState = snackBarHostState
         )
     }
