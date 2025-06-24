@@ -1,44 +1,33 @@
 version: 2.1
 
-orbs:
-  android: circleci/android@2.4.0
-  codecov: codecov/codecov@3.2.2
-
-executors:
-  android-executor:
+jobs:
+  build:
     docker:
-      - image: cimg/android:2023.09.1
+      - image: cimg/android:2024.01
     working_directory: ~/project
 
-jobs:
-  build-and-test:
-    executor: android-executor
     steps:
       - checkout
 
       - run:
-          name: Restore Gradle cache
-          command: ./gradlew dependencies
+          name: Set executable permission to Gradle
+          command: chmod +x ./gradlew
 
       - run:
-          name: Run Unit Tests
-          command: ./gradlew testDebugUnitTest
+          name: Run Unit Tests (app & core)
+          command: ./gradlew :app:testDebugUnitTest :core:testDebugUnitTest
 
       - run:
-          name: Generate Jacoco Merged Report
-          command: ./gradlew jacocoMergedReport
+          name: Generate Jacoco Coverage Report (optional)
+          command: ./gradlew jacocoTestReport
 
       - run:
-          name: Show Coverage Output
-          command: ls -R build/reports/jacoco
-
-      - codecov/upload:
-          file: build/reports/jacoco/jacocoMergedReport/xml/report.xml
-          flags: android
-          name: codecov-android
+          name: Upload Coverage to Codecov
+          command: |
+            bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
 
 workflows:
   version: 2
-  test-and-report:
+  test:
     jobs:
-      - build-and-test
+      - build
