@@ -10,12 +10,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.ecommerceapp.screen.main.NavigationType
 
 @Composable
-fun LoadingStateUI(isGrid: Boolean) {
+fun LoadingStateUI(
+    isGrid: Boolean,
+    navigationType: NavigationType
+) {
+    val gridCells = when (navigationType) {
+        NavigationType.NAV_RAIL -> GridCells.Adaptive(minSize = 180.dp)
+        NavigationType.BOTTOM_NAV -> GridCells.Fixed(2)
+    }
     AnimatedFilter()
     if (isGrid) {
-        LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+        LazyVerticalGrid(columns = gridCells) {
             items(10) { AnimatedGridShimmer() }
         }
     } else {

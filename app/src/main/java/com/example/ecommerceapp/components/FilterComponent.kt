@@ -49,7 +49,8 @@ fun FilterComponent(
             AssistChip(
                 onClick = { setBottomSheetOpen(true) },
                 label = {
-                    Text(text = stringResource(id = R.string.filter))
+                    Text(text = stringResource(id = R.string.filter),
+                        style= MaterialTheme.typography.bodyMedium)
                 },
                 leadingIcon = {
                     Icon(
@@ -71,7 +72,8 @@ fun FilterComponent(
                     items(filters) { filter ->
                         AssistChip(
                             onClick = { /* Optional: filter remove */ },
-                            label = { Text(text = filter) }
+                            label = { Text(text = filter,
+                                style= MaterialTheme.typography.bodyMedium) }
                         )
                     }
                 }

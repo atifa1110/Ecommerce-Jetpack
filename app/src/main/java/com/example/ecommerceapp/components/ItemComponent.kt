@@ -1,6 +1,5 @@
 package com.example.ecommerceapp.components
 
-import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -71,6 +70,7 @@ import com.example.core.ui.model.Wishlist
 import com.example.ecommerceapp.screen.status.RatingBar
 import com.example.ecommerceapp.ui.theme.DarkPurple
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+import com.example.ecommerceapp.ui.theme.poppins
 import com.example.ecommerceapp.utils.currency
 
 @Composable
@@ -83,8 +83,7 @@ fun SearchCard(
         headlineContent = {
             Text(
                 text = productName,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.W400
+                style = MaterialTheme.typography.bodySmall
             )
         },
         leadingContent = {
@@ -115,31 +114,123 @@ fun ProductCardGrid(
     product: Product,
     onClickCard: () -> Unit
 ) {
-    Column(Modifier.padding(top = 5.dp, bottom = 5.dp, end = 5.dp)) {
-        Card(modifier = Modifier
-            .width(186.dp)
+
+    Card(modifier = Modifier
+        .width(186.dp)
+        .clickable {
+            onClickCard()
+        },
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(3.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        )
+    ) {
+        Column {
+            Card(
+                modifier = Modifier.size(186.dp),
+                shape = RoundedCornerShape(
+                    topEnd = 8.dp,
+                    topStart = 8.dp,
+                    bottomEnd = 0.dp,
+                    bottomStart = 0.dp
+                )
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        modifier = Modifier.fillMaxSize(),
+                        model = if (product.image.isNotEmpty()) product.image else R.drawable.thumbnail,
+                        contentDescription = "Products image",
+                        contentScale = ContentScale.FillBounds,
+                        // Optional: add placeholder and error images for smoother UX
+                        placeholder = painterResource(id = R.drawable.thumbnail),
+                        error = painterResource(id = R.drawable.thumbnail)
+                    )
+                }
+            }
+
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text(
+                    text = product.productName,
+                    maxLines = 2,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                Text(
+                    text = currency(product.productPrice),
+                    fontWeight = FontWeight.W600,
+                    fontSize = 14.sp,
+                    fontFamily = poppins
+                )
+
+                Row(
+                    Modifier.padding(top = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(12.dp),
+                        imageVector = Icons.Filled.AccountCircle,
+                        contentDescription = "Account"
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text  = product.store,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+
+                Row(
+                    Modifier.padding(top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(12.dp),
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "Star"
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = "${product.productRating} | ${stringResource(R.string.sold)} ${product.sale}",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProductCardList(
+    product: Product,
+    onClickCard: () -> Unit
+) {
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
             .clickable {
                 onClickCard()
             },
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(3.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onBackground
-            )
-        ) {
-            Column {
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(3.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        )
+    ) {
+        Box {
+            Row(
+                modifier = Modifier.padding(10.dp)
+            ) {
                 Card(
-                    modifier = Modifier.size(186.dp),
-                    shape = RoundedCornerShape(
-                        topEnd = 8.dp,
-                        topStart = 8.dp,
-                        bottomEnd = 0.dp,
-                        bottomStart = 0.dp
-                    )
+                    modifier = Modifier.size(80.dp),
+                    shape = RoundedCornerShape(5.dp)
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
+                    Box(modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         AsyncImage(
@@ -153,24 +244,25 @@ fun ProductCardGrid(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.width(8.dp))
 
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp)
+                ) {
                     Text(
                         text = product.productName,
-                        fontWeight = FontWeight.W400,
-                        fontSize = 12.sp,
-                        maxLines = 2,
-                        lineHeight = 15.sp
+                        style = MaterialTheme.typography.bodySmall
                     )
-                    Spacer(modifier = Modifier.height(5.dp))
                     Text(
+                        modifier = Modifier.padding(vertical = 5.dp),
                         text = currency(product.productPrice),
                         fontWeight = FontWeight.W600,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        fontFamily = poppins
                     )
-
                     Row(
-                        Modifier.padding(top = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -180,14 +272,13 @@ fun ProductCardGrid(
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
-                            product.store,
-                            fontWeight = FontWeight.W400,
-                            fontSize = 10.sp
+                            text = product.store,
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
 
                     Row(
-                        Modifier.padding(top = 2.dp),
+                        modifier = Modifier.padding(top = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -197,9 +288,8 @@ fun ProductCardGrid(
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
-                            "${product.productRating} | ${stringResource(R.string.sold)} ${product.sale}",
-                            fontWeight = FontWeight.W400,
-                            fontSize = 10.sp
+                            text = "${product.productRating} | ${stringResource(R.string.sold)} ${product.sale}",
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                 }
@@ -209,38 +299,36 @@ fun ProductCardGrid(
 }
 
 @Composable
-fun ProductCardList(
-    product: Product,
-    onClickCard: () -> Unit
+fun WishlistCardList(
+    wishlist : Wishlist,
+    onAddToCart: () -> Unit,
+    onDeleteFavorite: (id: String) -> Unit
 ) {
-    Column(modifier = Modifier.padding(vertical = 5.dp)) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    onClickCard()
-                },
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(3.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onBackground
-            )
-        ) {
-            Box {
-                Row(
-                    modifier = Modifier.padding(10.dp)
-                ) {
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(3.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        )
+    ) {
+        Box {
+            Column(modifier = Modifier.padding(10.dp)) {
+                Row {
                     Card(
                         modifier = Modifier.size(80.dp),
                         shape = RoundedCornerShape(5.dp)
                     ) {
-                        Box(modifier = Modifier.fillMaxSize(),
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             AsyncImage(
                                 modifier = Modifier.fillMaxSize(),
-                                model = if (product.image.isNotEmpty()) product.image else R.drawable.thumbnail,
+                                model = if (wishlist.productImage.isNotEmpty()) wishlist.productImage else R.drawable.thumbnail,
                                 contentDescription = "Products image",
                                 contentScale = ContentScale.FillBounds,
                                 // Optional: add placeholder and error images for smoother UX
@@ -251,22 +339,22 @@ fun ProductCardList(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 10.dp)
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp)
                     ) {
                         Text(
-                            text = product.productName,
-                            fontWeight = FontWeight.W400,
-                            fontSize = 12.sp,
-                            lineHeight = 15.sp
+                            text = wishlist.productName,
+                            lineHeight = 15.sp,
+                            style = MaterialTheme.typography.bodySmall
                         )
                         Spacer(modifier = Modifier.height(5.dp))
+
                         Text(
-                            text = currency(product.productPrice),
+                            text = currency(wishlist.unitPrice),
                             fontWeight = FontWeight.W600,
-                            fontSize = 14.sp
+                            fontSize = 14.sp,
+                            fontFamily = poppins
                         )
                         Row(
                             Modifier.padding(top = 5.dp),
@@ -279,9 +367,8 @@ fun ProductCardList(
                             )
                             Spacer(modifier = Modifier.width(5.dp))
                             Text(
-                                product.store,
-                                fontWeight = FontWeight.W400,
-                                fontSize = 10.sp
+                                text = wishlist.store.toString(),
+                                style = MaterialTheme.typography.labelSmall
                             )
                         }
 
@@ -296,168 +383,66 @@ fun ProductCardList(
                             )
                             Spacer(modifier = Modifier.width(5.dp))
                             Text(
-                                "${product.productRating} | ${stringResource(R.string.sold)} ${product.sale}",
-                                fontWeight = FontWeight.W400,
-                                fontSize = 10.sp
+                                text = "${wishlist.productRating} | ${stringResource(R.string.sold)} ${wishlist.sale}",
+                                style = MaterialTheme.typography.labelSmall
                             )
                         }
                     }
                 }
-            }
-        }
-    }
-}
 
-@Composable
-fun WishlistCardList(
-    wishlist : Wishlist,
-    onAddToCart: () -> Unit,
-    onDeleteFavorite: (id: String) -> Unit
-) {
-    Column(
-        Modifier.padding(vertical = 5.dp)
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(3.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onBackground
-            )
-        ) {
-            Box {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Row {
-                        Card(
-                            modifier = Modifier.size(80.dp),
-                            shape = RoundedCornerShape(5.dp)
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row {
+                    Card(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable {},
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color.Gray),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                    ) {
+                        Box(modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                AsyncImage(
-                                    modifier = Modifier.fillMaxSize(),
-                                    model = if (wishlist.productImage.isNotEmpty()) wishlist.productImage else R.drawable.thumbnail,
-                                    contentDescription = "Products image",
-                                    contentScale = ContentScale.FillBounds,
-                                    // Optional: add placeholder and error images for smoother UX
-                                    placeholder = painterResource(id = R.drawable.thumbnail),
-                                    error = painterResource(id = R.drawable.thumbnail)
-                                )
-                            }
+                            Icon(
+                                modifier = Modifier.clickable {
+                                    onDeleteFavorite(wishlist.productId)
+                                },
+                                tint = MaterialTheme.colorScheme.primary,
+                                imageVector = Icons.Default.DeleteOutline,
+                                contentDescription = "Delete Favorite"
+                            )
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                    }
 
-                        Column(modifier = Modifier
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    OutlinedButton(
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 10.dp)
+                            .height(32.dp),
+                        onClick = { onAddToCart() },
+                        contentPadding = PaddingValues(0.dp) // Optional: tighten padding
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = wishlist.productName,
-                                fontWeight = FontWeight.W400,
-                                fontSize = 12.sp,
-                                lineHeight = 15.sp
+                                text = "+ " + stringResource(id = R.string.cart),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
-                            Spacer(modifier = Modifier.height(5.dp))
-
-                            Text(
-                                text = currency(wishlist.unitPrice),
-                                fontWeight = FontWeight.W600,
-                                fontSize = 14.sp
-                            )
-                            Row(
-                                Modifier.padding(top = 5.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    modifier = Modifier.size(12.dp),
-                                    imageVector = Icons.Filled.AccountCircle,
-                                    contentDescription = "Account"
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = wishlist.store.toString(),
-                                    fontWeight = FontWeight.W400,
-                                    fontSize = 10.sp
-                                )
-                            }
-
-                            Row(
-                                Modifier.padding(top = 2.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    modifier = Modifier.size(12.dp),
-                                    imageVector = Icons.Filled.Star,
-                                    contentDescription = "Star"
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    "${wishlist.productRating} | ${stringResource(R.string.sold)} ${wishlist.sale}",
-                                    fontWeight = FontWeight.W400,
-                                    fontSize = 10.sp
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row {
-                        Card(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clickable {},
-                            shape = RoundedCornerShape(8.dp),
-                            border = BorderStroke(1.dp, Color.Gray),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onBackground
-                            ),
-                        ) {
-                            Box(modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    modifier = Modifier.clickable {
-                                        onDeleteFavorite(wishlist.productId)
-                                    },
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    imageVector = Icons.Default.DeleteOutline,
-                                    contentDescription = "Delete Favorite"
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                        OutlinedButton(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(32.dp),
-                            onClick = { onAddToCart() },
-                            contentPadding = PaddingValues(0.dp) // Optional: tighten padding
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "+ " + stringResource(id = R.string.cart),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.W500,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
                         }
                     }
                 }
             }
         }
     }
+
 }
 
 @Composable
@@ -466,142 +451,139 @@ fun WishlistCardGrid(
     onAddToCart: () -> Unit,
     onDeleteFavorite: (id: String) -> Unit
 ) {
-    Column(Modifier.padding(top = 5.dp, bottom = 5.dp, end = 5.dp)) {
-        Card(modifier = Modifier.width(186.dp),
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(3.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onBackground
-            )
-        ) {
-            Column {
-                Card(modifier = Modifier.size(186.dp),
-                    shape = RoundedCornerShape(
-                        topEnd = 8.dp,
-                        topStart = 8.dp,
-                        bottomEnd = 0.dp,
-                        bottomStart = 0.dp
-                    )
+
+    Card(modifier = Modifier.width(186.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(3.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        )
+    ) {
+        Column {
+            Card(modifier = Modifier.size(186.dp),
+                shape = RoundedCornerShape(
+                    topEnd = 8.dp,
+                    topStart = 8.dp,
+                    bottomEnd = 0.dp,
+                    bottomStart = 0.dp
+                )
+            ) {
+                Box(modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier.fillMaxSize(),
-                            model = if (wishlist.productImage.isNotEmpty()) wishlist.productImage else R.drawable.thumbnail,
-                            contentDescription = "Products image",
-                            contentScale = ContentScale.FillBounds,
-                            // Optional: add placeholder and error images for smoother UX
-                            placeholder = painterResource(id = R.drawable.thumbnail),
-                            error = painterResource(id = R.drawable.thumbnail)
-                        )
-                    }
+                    AsyncImage(
+                        modifier = Modifier.fillMaxSize(),
+                        model = if (wishlist.productImage.isNotEmpty()) wishlist.productImage else R.drawable.thumbnail,
+                        contentDescription = "Products image",
+                        contentScale = ContentScale.FillBounds,
+                        // Optional: add placeholder and error images for smoother UX
+                        placeholder = painterResource(id = R.drawable.thumbnail),
+                        error = painterResource(id = R.drawable.thumbnail)
+                    )
+                }
+            }
+
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text(
+                    text = wishlist.productName,
+                    maxLines = 2,
+                    lineHeight = 15.sp,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Text(
+                    text = currency(wishlist.unitPrice),
+                    fontWeight = FontWeight.W600,
+                    fontSize = 14.sp,
+                    fontFamily = poppins
+                )
+
+                Row(
+                    Modifier.padding(top = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(12.dp),
+                        imageVector = Icons.Filled.AccountCircle,
+                        contentDescription = "Account"
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = wishlist.store.toString(),
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
 
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Text(
-                        text = wishlist.productName,
-                        fontWeight = FontWeight.W400,
-                        fontSize = 12.sp,
-                        maxLines = 2,
-                        lineHeight = 15.sp
+                Row(
+                    Modifier.padding(top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(12.dp),
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "Star"
                     )
-                    Spacer(modifier = Modifier.height(5.dp))
-
+                    Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = currency(wishlist.unitPrice),
-                        fontWeight = FontWeight.W600,
-                        fontSize = 14.sp
+                        text = "${wishlist.productRating} | ${stringResource(R.string.sold)} ${wishlist.sale}",
+                        style = MaterialTheme.typography.labelSmall
                     )
+                }
 
-                    Row(
-                        Modifier.padding(top = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row {
+                    Card(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable {},
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color.Gray),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        )
                     ) {
-                        Icon(
-                            modifier = Modifier.size(12.dp),
-                            imageVector = Icons.Filled.AccountCircle,
-                            contentDescription = "Account"
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = wishlist.store.toString(),
-                            fontWeight = FontWeight.W400,
-                            fontSize = 10.sp
-                        )
-                    }
-
-                    Row(
-                        Modifier.padding(top = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(12.dp),
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = "Star"
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            "${wishlist.productRating} | ${stringResource(R.string.sold)} ${wishlist.sale}",
-                            fontWeight = FontWeight.W400,
-                            fontSize = 10.sp
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row {
-                        Card(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clickable {},
-                            shape = RoundedCornerShape(8.dp),
-                            border = BorderStroke(1.dp, Color.Gray),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        Box(modifier = Modifier
+                            .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier.clickable {
+                                    onDeleteFavorite(wishlist.productId)
+                                },
+                                tint = MaterialTheme.colorScheme.primary,
+                                imageVector = Icons.Default.DeleteOutline,
+                                contentDescription = "Delete Favorite"
                             )
-                        ) {
-                            Box(modifier = Modifier
-                                .fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    modifier = Modifier.clickable {
-                                        onDeleteFavorite(wishlist.productId)
-                                    },
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    imageVector = Icons.Default.DeleteOutline,
-                                    contentDescription = "Delete Favorite"
-                                )
-                            }
                         }
+                    }
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                        OutlinedButton(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(32.dp),
-                            onClick = { onAddToCart() },
-                            contentPadding = PaddingValues(0.dp) // Optional: tighten padding
+                    OutlinedButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(32.dp),
+                        onClick = { onAddToCart() },
+                        contentPadding = PaddingValues(0.dp) // Optional: tighten padding
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "+ " + stringResource(id = R.string.cart),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.W500,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
+                            Text(
+                                text = "+ " + stringResource(id = R.string.cart),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }
             }
         }
+
     }
 }
 
@@ -661,21 +643,20 @@ fun CartListCard(
                 Text(
                     text = cart.productName,
                     maxLines = 1,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.W500,
+                    style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
+                    modifier = Modifier.padding(vertical = 4.dp),
                     text = cart.variantName,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.W400,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
+                    modifier = Modifier.padding(vertical = 4.dp),
                     text = if (cart.stock > 9) stringResource(id = R.string.stock, cart.stock) else stringResource(id = R.string.stock_few, cart.stock),
                     color = if (cart.stock > 9) MaterialTheme.colorScheme.onBackground else Color.Red,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.W400,
+                    style = MaterialTheme.typography.labelSmall,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -688,8 +669,7 @@ fun CartListCard(
                     ) {
                         Text(
                             text = currency(cart.unitPrice),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W500,
+                            style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -736,8 +716,7 @@ fun CartListCard(
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Text(
                                     text = cart.quantity.toString(),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.W500
+                                    style = MaterialTheme.typography.labelMedium,
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Icon(
@@ -795,21 +774,20 @@ fun CheckoutListCart(
             Text(
                 text = cart.productName,
                 maxLines = 1,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W500,
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
+                modifier = Modifier.padding(vertical = 4.dp),
                 text = cart.variantName,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.W400,
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
+                modifier = Modifier.padding(vertical = 4.dp),
                 text = if (cart.stock > 9) stringResource(id = R.string.stock, cart.stock) else stringResource(id = R.string.stock_few, cart.stock),
                 color = if (cart.stock > 9) MaterialTheme.colorScheme.onBackground else Color.Red,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.W400
+                style = MaterialTheme.typography.labelSmall,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -823,8 +801,7 @@ fun CheckoutListCart(
                 ) {
                     Text(
                         text = currency(cart.unitPrice),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W500,
+                        style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 }
@@ -861,8 +838,7 @@ fun CheckoutListCart(
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = cart.quantity.toString(),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.W500
+                                style = MaterialTheme.typography.labelMedium
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Icon(
@@ -926,12 +902,14 @@ fun TransactionListCard(
                             Text(
                                 text = stringResource(id = R.string.shopping),
                                 fontSize = 10.sp,
-                                fontWeight = FontWeight.W600
+                                fontWeight = FontWeight.W600,
+                                fontFamily = poppins
                             )
                             Text(
                                 text = transaction.date,
                                 fontSize = 10.sp,
-                                fontWeight = FontWeight.W400
+                                fontWeight = FontWeight.W400,
+                                fontFamily = poppins
                             )
                         }
                     }
@@ -955,7 +933,8 @@ fun TransactionListCard(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.W600,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    fontFamily = poppins
                                 )
                             }
                         }
@@ -995,14 +974,13 @@ fun TransactionListCard(
                         Text(
                             text = transaction.name,
                             maxLines = 1,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W500
+                            style = MaterialTheme.typography.labelLarge
                         )
-                        val item: List<Int> = transaction.items.map { it.quantity }
+                        val item = transaction.items.map { it.quantity }
                         Text(
+                            modifier = Modifier.padding(vertical = 4.dp),
                             text = pluralStringResource(R.plurals.item_count, item.sum(), item.sum()),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.W400
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                 }
@@ -1020,12 +998,14 @@ fun TransactionListCard(
                         Text(
                             text = stringResource(id = R.string.total_spend),
                             fontSize = 10.sp,
-                            fontWeight = FontWeight.W400
+                            fontWeight = FontWeight.W400,
+                            fontFamily = poppins
                         )
                         Text(
                             text = currency(transaction.total),
                             fontSize = 12.sp,
-                            fontWeight = FontWeight.W600
+                            fontWeight = FontWeight.W600,
+                            fontFamily = poppins
                         )
                     }
 
@@ -1059,7 +1039,8 @@ fun TransactionListCard(
                                     color = Color.White,
                                     text = stringResource(id = R.string.review),
                                     fontSize = 10.sp,
-                                    fontWeight = FontWeight.W500
+                                    fontWeight = FontWeight.W500,
+                                    fontFamily = poppins
                                 )
                             }
                         }
@@ -1098,12 +1079,11 @@ fun ReviewListCard(
                         contentScale = ContentScale.FillBounds,
                         contentDescription = "User image"
                     )
-                }else{
+                }else {
                     val initial = review.userName.firstOrNull()?.uppercase() ?: "?"
                     Text(
                         text = initial,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.W500,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 }
@@ -1115,6 +1095,7 @@ fun ReviewListCard(
                 Text(text = review.userName,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.W600,
+                    fontFamily = poppins,
                     color = MaterialTheme.colorScheme.onBackground
                 )
 
@@ -1199,8 +1180,7 @@ fun PaymentListCart(
                         Text(
                             modifier = Modifier.weight(1f),
                             text = (if (item.label.isEmpty() == true) stringResource(id = R.string.choose_payment) else item.label).toString(),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W500
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
 
@@ -1265,8 +1245,7 @@ fun NotificationListCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = notification.type,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.W400,
+                        style = MaterialTheme.typography.bodySmall,
                         color = if (notification.isRead)
                             MaterialTheme.colorScheme.onBackground else Color.Black
                     )
@@ -1277,8 +1256,7 @@ fun NotificationListCard(
                     ) {
                         Text(
                             text = "${notification.date}, ${notification.time}",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.W400,
+                            style = MaterialTheme.typography.bodySmall,
                             color = if (notification.isRead)
                                 MaterialTheme.colorScheme.onBackground else Color.Black
                         )
@@ -1289,6 +1267,7 @@ fun NotificationListCard(
                     text = notification.title,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.W600,
+                    fontFamily = poppins,
                     color = if (notification.isRead)
                         MaterialTheme.colorScheme.onBackground else Color.Black
                 )
@@ -1296,8 +1275,8 @@ fun NotificationListCard(
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = notification.body,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.W400,
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 20.sp,
                     color = if (notification.isRead)
                         MaterialTheme.colorScheme.onBackground else Color.Black
                 )
@@ -1309,16 +1288,13 @@ fun NotificationListCard(
 
 @Preview("Light Mode", device = Devices.PIXEL_3)
 @Composable
-fun PaymentCardPreview(){
+fun ProductCardPreview(){
     EcommerceAppTheme {
-        PaymentListCart(
-          item = Payment.PaymentItem(
-              label = "Bank BCA",
-              image = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png",
-              status = true
-          ),
-          onItemClick = {}
-        )
+       ProductCardGrid(
+           product = Product(
+               "1","DELL ALIENWARE M15 R5 RYZEN 7 5800 16GB 512SSD RTX3050Ti 4GB W10 15.6F",15000000,"image","brand","Apple Store",28,5.0F
+           )
+       ) { }
     }
 }
 
@@ -1329,7 +1305,7 @@ fun TransactionCardPreview(){
         TransactionListCard(
             transaction = Transaction(
                 invoiceId = "2e77cfe0-6a5a-4a2d-9db9-9ee9ad6692b0",
-                status = true,
+                status = false,
                 date= "04 Jun 2025",
                 time = "12:03",
                 payment = "Bank BCA",
@@ -1352,7 +1328,6 @@ fun TransactionCardPreview(){
 }
 
 @Preview("Light Mode", device = Devices.PIXEL_3)
-@Preview("Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun CardNotificationPreview() {
     val notification = Notification(
@@ -1360,7 +1335,7 @@ fun CardNotificationPreview() {
         "Nikmati Kemeriahan ulang tahun Telkomsel pada har jumat 21 Juli 2023 pukul 19.00 - 21.00 WIB langsung dari Beach City International Stadium dengan berbagai kemudahan untuk mendapatkan aksesnya.",
         "",
         "Promo",
-        "21 Jul 2023","12:34", false
+        "21 Jul 2023","12:34", true
     )
     EcommerceAppTheme {
         NotificationListCard(

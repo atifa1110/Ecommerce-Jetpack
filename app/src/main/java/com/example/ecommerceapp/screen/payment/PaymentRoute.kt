@@ -1,5 +1,6 @@
 package com.example.ecommerceapp.screen.payment
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,14 +23,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.ui.model.Notification
 import com.example.ecommerceapp.R
 import com.example.ecommerceapp.components.BackTopAppBar
 import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.PaymentListCart
 import com.example.core.ui.model.Payment
+import com.example.ecommerceapp.screen.notification.NotificationScreen
+import com.example.ecommerceapp.screen.notification.NotificationUiState
+import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -140,6 +147,45 @@ fun PaymentComposable(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider(thickness = 4.dp)
+        HorizontalDivider(thickness = 2.dp)
+    }
+}
+
+@Preview("Light Mode", device = Devices.PIXEL_3)
+@Preview("Dark Mode", device = Devices.PIXEL_3, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PaymentScreenPreview(){
+    EcommerceAppTheme {
+        val snackBarHostState = remember { SnackbarHostState() }
+        PaymentScreen(
+            onNavigateBack = {},
+            onItemClick = { },
+            isLoading = false,
+            result = listOf(
+                Payment("Title", listOf(
+                    Payment.PaymentItem(
+                        "Label","Image",true
+                    ),
+                    Payment.PaymentItem(
+                        "Label1","Image1",true
+                    ),
+                    Payment.PaymentItem(
+                        "Label2","Image2",true
+                    ),
+                )),
+                Payment("Title2", listOf(
+                    Payment.PaymentItem(
+                        "Label","Image",true
+                    ),
+                    Payment.PaymentItem(
+                        "Label1","Image1",true
+                    ),
+                    Payment.PaymentItem(
+                        "Label2","Image2",true
+                    ),
+                ))
+            ),
+            snackBarHostState = snackBarHostState
+        )
     }
 }

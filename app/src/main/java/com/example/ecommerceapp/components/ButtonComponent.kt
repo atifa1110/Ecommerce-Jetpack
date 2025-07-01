@@ -47,6 +47,7 @@ fun ButtonComponent(
         Text(
             text = stringResource(id = buttonText),
             fontWeight = FontWeight.W500,
+            style = MaterialTheme.typography.labelLarge,
         )
     }
 
@@ -94,8 +95,7 @@ fun DividerButton(tryingToLogin: Boolean = true) {
             } else {
                 stringResource(id = R.string.login_with)
             },
-            fontSize = MaterialTheme.typography.bodySmall.fontSize,
-            fontWeight = FontWeight.Normal
+            style = MaterialTheme.typography.bodySmall,
         )
 
         Row(
@@ -138,11 +138,8 @@ fun TextTermCondition(tryingToLogin: Boolean = true) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp),
-        style = TextStyle(
-            textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.bodySmall.fontSize,
-            fontWeight = FontWeight.Normal
-        ),
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.bodySmall,
         text = annotatedString
     )
 }

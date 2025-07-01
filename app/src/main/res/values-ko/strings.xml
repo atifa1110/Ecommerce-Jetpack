@@ -7,6 +7,7 @@
     <string name="login">로그인</string>
     <string name="email">이메일</string>
     <string name="email_invalid">유효하지 않은 이메일</string>
+    <string name="email_hint_example">Contoh: %1$s</string>
     <string name="password">비밀번호</string>
     <string name="password_invalid">유효하지 않은 비밀번호</string>
     <string name="password_min">최소 8자</string>

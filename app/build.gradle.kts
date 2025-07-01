@@ -265,6 +265,9 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.compose.runtime.livedata)
 
+    //window size
+    implementation(libs.material3.window.size)
+
     //test
     testImplementation(libs.truth)
     testImplementation(libs.mockito.core)

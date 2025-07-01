@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.ecommerceapp.screen.main.NavigationType
 
 @Composable
 fun BottomNavHost(
+    navigationType: NavigationType,
     navController: NavHostController,
     startDestination: String,
     isDarkMode : Boolean,
@@ -27,11 +29,14 @@ fun BottomNavHost(
             onToggleTheme = onToggleTheme
         )
         storeGraph(
+            navigationType = navigationType,
             onNavigateToDetail = onNavigateToDetail
         )
         transactionGraph(
             onNavigateToStatus = onNavigateToStatus
         )
-        wishlistGraph()
+        wishlistGraph(
+            navigationType = navigationType
+        )
     }
 }

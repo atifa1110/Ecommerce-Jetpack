@@ -151,14 +151,12 @@ fun CheckoutScreen(
                     ) {
                         Text(
                             text = stringResource(id = R.string.total),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.W400
+                            style = MaterialTheme.typography.bodySmall
                         )
 
                         Text(
                             text = currency(totalPrice),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.W600
+                            style = MaterialTheme.typography.titleSmall
                         )
                     }
                     Column(
@@ -180,7 +178,7 @@ fun CheckoutScreen(
                         ) {
                             Text(
                                 text = stringResource(id = R.string.pay),
-                                fontWeight = FontWeight.W500
+                                style = MaterialTheme.typography.labelLarge
                             )
                         }
                     }
@@ -218,8 +216,7 @@ fun CheckoutContent(
         item {
             Text(
                 text = stringResource(id = R.string.purchased_items),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.W500
+                style = MaterialTheme.typography.titleMedium
             )
         }
 

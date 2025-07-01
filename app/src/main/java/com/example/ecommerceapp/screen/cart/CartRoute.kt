@@ -117,13 +117,11 @@ fun CartScreen(
                     ) {
                         Text(
                             text = stringResource(id = R.string.total),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.W400
+                            style = MaterialTheme.typography.labelMedium
                         )
                         Text(
                             text = currency(totalCheckedPrice),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.W600
+                            style = MaterialTheme.typography.titleSmall
                         )
                     }
                     Column(
@@ -143,7 +141,7 @@ fun CartScreen(
                         ) {
                             Text(
                                 text = stringResource(id = R.string.buy),
-                                fontWeight = FontWeight.W500
+                                style = MaterialTheme.typography.labelLarge
                             )
                         }
                     }
@@ -216,7 +214,8 @@ fun CartContent(
                             checkmarkColor = MaterialTheme.colorScheme.background
                         )
                     )
-                    Text(text = stringResource(id = R.string.choose_all))
+                    Text(text = stringResource(id = R.string.choose_all),
+                        style = MaterialTheme.typography.bodyMedium)
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
@@ -229,8 +228,7 @@ fun CartContent(
                     ) {
                         Text(
                             text = stringResource(id = R.string.erase),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W500,
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                 }

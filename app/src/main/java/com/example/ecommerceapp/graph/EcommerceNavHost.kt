@@ -4,10 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.ecommerceapp.screen.main.NavigationType
 
 @Composable
 fun EcommerceNavHost (
     navController: NavHostController,
+    navigationType: NavigationType,
     isNotification : String?,
     startDestination: String,
     isDarkMode : Boolean,
@@ -57,6 +59,7 @@ fun EcommerceNavHost (
         )
 
         mainGraph(
+            navigationType = navigationType,
             isDarkMode = isDarkMode,
             onToggleTheme = onToggleTheme,
             onNavigateToDetail = {

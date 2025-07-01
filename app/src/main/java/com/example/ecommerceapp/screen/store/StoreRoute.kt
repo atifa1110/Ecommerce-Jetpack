@@ -1,6 +1,7 @@
 package com.example.ecommerceapp.screen.store
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,9 +42,11 @@ import com.example.ecommerceapp.components.ProductCardGrid
 import com.example.ecommerceapp.components.ProductCardList
 import com.example.ecommerceapp.components.SearchComponent
 import com.example.core.ui.model.Product
+import com.example.ecommerceapp.screen.main.NavigationType
 
 @Composable
 fun StoreRoute(
+    navigationType: NavigationType,
     onNavigateToDetail : (String) -> Unit,
     viewModel: StoreViewModel = hiltViewModel()
 ) {
@@ -54,6 +57,7 @@ fun StoreRoute(
     val filters = uiState.productFilter.activeFilter
 
     StoreScreen(
+        navigationType = navigationType,
         uiState = uiState,
         products = products,
         filters = filters,
@@ -85,6 +89,7 @@ fun StoreRoute(
 
 @Composable
 fun StoreScreen(
+    navigationType: NavigationType,
     uiState: StoreUiState,
     products: LazyPagingItems<Product>,
     filters : List<String>,
@@ -144,11 +149,15 @@ fun StoreScreen(
                 }
                 LoadState.Loading -> {
                     // ⏳ Show loading
-                    LoadingStateUI(uiState.isClickedGrid)
+                    LoadingStateUI(
+                        navigationType = navigationType,
+                        isGrid = uiState.isClickedGrid
+                    )
                 }
                 is LoadState.NotLoading -> {
                     // ✅ Show content
                     SuccessStateUI(
+                        navigationType = navigationType,
                         isClickedGrid = uiState.isClickedGrid,
                         isBottomSheetOpen = uiState.isBottomSheetOpen,
                         products = products,
@@ -178,6 +187,7 @@ fun StoreScreen(
 
 @Composable
 fun SuccessStateUI(
+    navigationType: NavigationType,
     isClickedGrid: Boolean,
     isBottomSheetOpen : Boolean,
     products: LazyPagingItems<Product>,
@@ -209,7 +219,8 @@ fun SuccessStateUI(
     StoreProductList(
         isClickedGrid = isClickedGrid,
         products = products,
-        onDetailClick = onDetailClick
+        onDetailClick = onDetailClick,
+        navigationType = navigationType
     )
 
     BottomSheetFilter(
@@ -235,14 +246,15 @@ fun SuccessStateUI(
 fun StoreProductList(
     isClickedGrid: Boolean,
     products: LazyPagingItems<Product>,
-    onDetailClick: (id: String) -> Unit
+    onDetailClick: (id: String) -> Unit,
+    navigationType: NavigationType
 ) {
     var refreshing by remember { mutableStateOf(false) }
     val state = rememberPullRefreshState(refreshing, { products.refresh() })
 
     Box(modifier = Modifier.pullRefresh(state)) {
         if (isClickedGrid) {
-            GridProductList(products = products, onDetailClick = onDetailClick)
+            GridProductList(products = products, onDetailClick = onDetailClick, navigationType = navigationType)
         } else {
             ListProductList(products = products, onDetailClick = onDetailClick)
         }
@@ -258,9 +270,19 @@ fun StoreProductList(
 @Composable
 fun GridProductList(
     products: LazyPagingItems<Product>,
-    onDetailClick: (id: String) -> Unit
+    onDetailClick: (id: String) -> Unit,
+    navigationType: NavigationType
 ) {
-    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+    val gridCells = when (navigationType) {
+        NavigationType.NAV_RAIL -> GridCells.Adaptive(minSize = 180.dp)
+        NavigationType.BOTTOM_NAV -> GridCells.Fixed(2)
+    }
+
+    LazyVerticalGrid(
+        columns = gridCells,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         items(
             count = products.itemCount,
             key = products.itemKey { it.productId }
@@ -285,7 +307,10 @@ fun ListProductList(
     products: LazyPagingItems<Product>,
     onDetailClick: (id: String) -> Unit,
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         items(
             count = products.itemCount,
             key = products.itemKey { it.productId }

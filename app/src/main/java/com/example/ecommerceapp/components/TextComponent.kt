@@ -34,7 +34,7 @@ fun TextComponent(
         modifier = Modifier.fillMaxWidth(),
         value = text,
         onValueChange = { onTextChanged(it) },
-        label = {
+        placeholder = {
             Text(
                 text = stringResource(id = label),
                 style = MaterialTheme.typography.bodyMedium,

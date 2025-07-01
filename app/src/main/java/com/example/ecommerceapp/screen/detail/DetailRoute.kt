@@ -72,6 +72,7 @@ import com.example.core.ui.model.ProductDetail
 import com.example.core.ui.model.ProductVariant
 import com.example.ecommerceapp.screen.shared.SharedViewModel
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+import com.example.ecommerceapp.ui.theme.poppins
 import com.example.ecommerceapp.utils.currency
 import kotlinx.coroutines.flow.collectLatest
 
@@ -292,7 +293,8 @@ fun DetailContent(
                         Text(
                             text = currency(totalPrice),
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.W600
+                            fontWeight = FontWeight.W600,
+                            fontFamily = poppins
                         )
                     }
                     Row(
@@ -338,8 +340,7 @@ fun DetailContent(
 
                 Text(
                     text = product.productName.toString(),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.W400
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -351,17 +352,16 @@ fun DetailContent(
                 ) {
                     Text(
                         text = stringResource(id = R.string.sold) + " ${product.sale}",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.W400
+                        style = MaterialTheme.typography.bodySmall
                     )
 
                     AssistChip(
+                        modifier = Modifier.size(100.dp,30.dp),
                         onClick = {},
                         label = {
                             Text(
                                 text = "${product.productRating} (${product.totalRating})",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.W400
+                                style = MaterialTheme.typography.bodySmall
                             )
                         },
                         leadingIcon = {
@@ -372,7 +372,7 @@ fun DetailContent(
                                 contentDescription = "Star"
                             )
                         },
-                        shape = RoundedCornerShape(20)
+                        shape = RoundedCornerShape(50)
                     )
                 }
             }
@@ -383,8 +383,7 @@ fun DetailContent(
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(id = R.string.choose_variant),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.W500
+                    style = MaterialTheme.typography.titleMedium
                 )
 
                 product.productVariant?.takeIf { it.isNotEmpty() }?.let { variants ->
@@ -419,8 +418,7 @@ fun DetailContent(
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(id = R.string.description),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.W500,
+                    style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
@@ -428,8 +426,7 @@ fun DetailContent(
                         .fillMaxWidth()
                         .padding(top = 10.dp),
                     text = product.description.toString(),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.W400
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -449,8 +446,7 @@ fun DetailContent(
                     ) {
                         Text(
                             text = stringResource(id = R.string.buyer_review),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.W500
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                     Row(
@@ -463,8 +459,7 @@ fun DetailContent(
                         ) {
                             Text(
                                 text = stringResource(id = R.string.see_all),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.W500
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
@@ -484,11 +479,12 @@ fun DetailContent(
                         Text(
                             text = product.productRating.toString(),
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.W600
+                            fontWeight = FontWeight.W600,
+                            fontFamily = poppins
                         )
                         Text(
-                            text = " / 5.0", fontSize = 14.sp,
-                            fontWeight = FontWeight.W400
+                            text = " / 5.0",
+                            style = MaterialTheme.typography.bodyMedium
                         )
 
                     }
@@ -500,14 +496,14 @@ fun DetailContent(
                                 id = R.string.buyer_satisfied
                             ),
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.W600
+                            fontWeight = FontWeight.W600,
+                            fontFamily = poppins
                         )
                         Text(
                             text = "${product.totalRating} " + stringResource(id = R.string.rating) + " · " + "${product.totalReview} " + stringResource(
                                 id = R.string.review
                             ),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W400
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }

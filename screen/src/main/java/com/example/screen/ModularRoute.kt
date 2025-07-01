@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +40,10 @@ fun ModularRoute(
                         IconButton(onClick = onNavigateToBack){
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, "back button")
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    ),
                 )
                 HorizontalDivider()
             }
@@ -60,6 +64,7 @@ fun ModularScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = stringResource(id = R.string.modular))
+        Text(text = stringResource(id = R.string.modular),
+            style = MaterialTheme.typography.bodyMedium)
     }
 }

@@ -1,8 +1,10 @@
 package com.example.ecommerceapp.components
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,13 +27,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.ecommerceapp.ui.theme.poppins
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,13 +67,12 @@ fun CenterTopAppBar(
 fun MainTopAppBar(
     name: String,
     image: String,
-    badgeNotification : Int,
-    badgeCart : Int,
-    onNavigateToNotification : () -> Unit,
-    onNavigateToCart : () -> Unit,
-    onNavigateToModular : () -> Unit
-
-){
+    badgeNotification: Int,
+    badgeCart: Int,
+    onNavigateToNotification: () -> Unit,
+    onNavigateToCart: () -> Unit,
+    onNavigateToModular: () -> Unit
+) {
     Column {
         TopAppBar(
             title = {
@@ -77,78 +83,85 @@ fun MainTopAppBar(
                 )
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background),
+                containerColor = MaterialTheme.colorScheme.background
+            ),
             navigationIcon = {
                 IconButton(onClick = { /* your logic */ }) {
-                    Box(
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "account_profile",
                         modifier = Modifier
-                            .size(24.dp) // total size of the IconButton
+                            .size(28.dp)
                             .clip(CircleShape)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "account_profile",
-                            modifier = Modifier.fillMaxSize())
-                    }
+                    )
                 }
             },
             actions = {
-                IconButton(
-                    modifier = Modifier.width(50.dp),
-                    onClick = { onNavigateToNotification() }
-                ) {
-                    BadgedBox(
-                        badge = {
-                            if (badgeNotification > 0) {
-                                Badge(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer
-                                ) {
-                                    Text(
-                                        text = badgeNotification.toString(),
-                                        color = Color.White
-                                    )
-                                }
-                            }
-                        }
-                    ) {
-                        Icon(
-                            Icons.Filled.Notifications,
-                            contentDescription = "Notifications"
-                        )
-                    }
-                }
-
-                IconButton(
-                    modifier = Modifier.width(50.dp),
-                    onClick = { onNavigateToCart() }
-                ) {
-                    BadgedBox(
-                        badge = {
-                            if (badgeCart > 0) {
-                                Badge(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer
-                                ) {
-                                    Text(
-                                        text = badgeCart.toString(),
-                                        color = Color.White
-                                    )
-                                }
-                            }
-                        }
-                    ) {
-                        Icon(
-                            Icons.Filled.ShoppingCart,
-                            contentDescription = "Cart"
-                        )
-                    }
-                }
-
+                IconWithBadge(
+                    icon = Icons.Default.Notifications,
+                    contentDescription = "Notifications",
+                    badgeCount = badgeNotification,
+                    onClick = onNavigateToNotification
+                )
+                IconWithBadge(
+                    icon = Icons.Default.ShoppingCart,
+                    contentDescription = "Cart",
+                    badgeCount = badgeCart,
+                    onClick = onNavigateToCart
+                )
                 IconButton(onClick = { onNavigateToModular() }) {
-                    Icon(Icons.Filled.Reorder, contentDescription = null)
+                    Icon(Icons.Filled.Reorder, contentDescription = "Menu")
                 }
             }
         )
         HorizontalDivider()
+    }
+}
+
+
+@Composable
+fun IconWithBadge(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    contentDescription: String,
+    badgeCount: Int,
+    maxCount: Int = 99,
+    onClick: () -> Unit
+) {
+    val displayText = if (badgeCount > maxCount) "$maxCount+" else badgeCount.toString()
+    val isSingleChar = displayText.length == 1
+
+    IconButton(
+        modifier = Modifier.size(50.dp),
+        onClick = onClick
+    ) {
+        BadgedBox(
+            badge = {
+                if (badgeCount > 0) {
+                    Badge(
+                        modifier = if (isSingleChar) {
+                            modifier.size(18.dp)
+                        } else {
+                            modifier.defaultMinSize(minWidth = 18.dp, minHeight = 18.dp)
+                        },
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = Color.White
+                    ) {
+                        Text(
+                            text = displayText,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription
+            )
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.ecommerceapp.screen.wishlist
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,18 +36,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.ui.model.Wishlist
 import com.example.ecommerceapp.R
 import com.example.ecommerceapp.components.ErrorPage
 import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.WishlistCardGrid
 import com.example.ecommerceapp.components.WishlistCardList
+import com.example.ecommerceapp.screen.main.NavigationType
+import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+import com.example.ecommerceapp.ui.theme.poppins
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun WishlistRoute(
+    navigationType: NavigationType,
     viewModel: WishlistViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -68,6 +76,7 @@ fun WishlistRoute(
     }
 
     WishlistScreen(
+        navigationType = navigationType,
         uiState = uiState,
         snackBarHostState = snackBarHostState,
         deleteWishlist = viewModel::deleteWishlist,
@@ -78,6 +87,7 @@ fun WishlistRoute(
 
 @Composable
 fun WishlistScreen(
+    navigationType: NavigationType,
     uiState: WishlistUiState,
     snackBarHostState : SnackbarHostState,
     deleteWishlist : (String) -> Unit,
@@ -89,6 +99,7 @@ fun WishlistScreen(
     ) {
         WishlistContent(
             modifier = Modifier.padding(it),
+            navigationType = navigationType,
             isClickedGrid = uiState.isClickedGrid,
             uiState = uiState,
             deleteWishlist = deleteWishlist,
@@ -101,6 +112,7 @@ fun WishlistScreen(
 @Composable
 fun WishlistContent(
     modifier: Modifier,
+    navigationType: NavigationType,
     isClickedGrid : Boolean,
     uiState: WishlistUiState,
     deleteWishlist : (String) -> Unit,
@@ -124,8 +136,10 @@ fun WishlistContent(
         )
     } else {
         Column(
-            modifier.background(MaterialTheme.colorScheme.background)
-                .fillMaxSize().padding(16.dp)
+            modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -140,7 +154,8 @@ fun WishlistContent(
                         modifier = Modifier.fillMaxWidth(),
                         text = "${uiState.wishlists.size} " + stringResource(id = R.string.item),
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.W400
+                        fontWeight = FontWeight.W400,
+                        fontFamily = poppins
                     )
                 }
 
@@ -167,7 +182,15 @@ fun WishlistContent(
             }
 
             if (isClickedGrid) {
-                LazyVerticalGrid(GridCells.Fixed(2)) {
+                val gridCells = when (navigationType) {
+                    NavigationType.NAV_RAIL -> GridCells.Adaptive(minSize = 180.dp)
+                    NavigationType.BOTTOM_NAV -> GridCells.Fixed(2)
+                }
+                LazyVerticalGrid(
+                    columns = gridCells,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     items(uiState.wishlists) { item ->
                         WishlistCardGrid(
                             wishlist = item,
@@ -178,8 +201,8 @@ fun WishlistContent(
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(uiState.wishlists) { item ->
                         WishlistCardList(
@@ -194,3 +217,29 @@ fun WishlistContent(
     }
 }
 
+@Preview("Light Mode", device = Devices.PIXEL_3)
+@Preview("Dark Mode", device = Devices.PIXEL_3, uiMode = Configuration.UI_MODE_NIGHT_YES)
+
+@Composable
+fun WishlistPreview(){
+    EcommerceAppTheme {
+        val snackBarHostState = remember { SnackbarHostState() }
+        WishlistScreen(
+            navigationType = NavigationType.BOTTOM_NAV,
+            uiState = WishlistUiState(
+                isLoading = false,
+                isClickedGrid = false,
+                isError = false,
+                wishlists = listOf(
+                    Wishlist(
+                        "1","Product Name","Product Image",10000000,"Variant","Store",7,4.0F,9
+                    )
+                )
+            ),
+            snackBarHostState = snackBarHostState,
+            deleteWishlist = { },
+            setClickedGrid = {},
+            addToCart = {}
+        )
+    }
+}

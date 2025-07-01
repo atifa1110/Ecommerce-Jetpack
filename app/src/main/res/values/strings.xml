@@ -6,6 +6,7 @@
     <string name="login">Login</string>
     <string name="email">Email</string>
     <string name="email_invalid">Email Invalid</string>
+    <string name="email_hint_example">Example: %1$s</string>
     <string name="password">Password</string>
     <string name="password_invalid">Password Invalid</string>
     <string name="password_min">Minimal 8 character</string>
@@ -51,7 +52,7 @@
     <string name="category">Category</string>
     <string name="price">Price</string>
     <string name="apply">Apply</string>
-    <string name="detail">Detail</string>
+    <string name="detail">Detail Product</string>
     <string name="buy_now">Buy Now</string>
     <string name="cart">Cart</string>
     <string name="choose_variant">Choose Variant</string>

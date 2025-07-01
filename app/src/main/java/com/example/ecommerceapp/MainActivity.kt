@@ -7,6 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,6 +25,7 @@ import com.example.ecommerceapp.graph.MainDestination
 import com.example.ecommerceapp.graph.NotificationDestination
 import com.example.ecommerceapp.graph.OnBoardingDestination
 import com.example.ecommerceapp.graph.ProfileDestination
+import com.example.ecommerceapp.screen.main.NavigationType
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -29,6 +33,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import dagger.hilt.android.AndroidEntryPoint
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -68,9 +73,17 @@ class MainActivity : ComponentActivity() {
             RequestNotificationPermissionDialog()
             if (isLoadingComplete) {
                 val navController = rememberNavController()
+                val windowSizeClass = calculateWindowSizeClass(this)
+                val navigationType = when (windowSizeClass.widthSizeClass) {
+                    WindowWidthSizeClass.Compact -> NavigationType.BOTTOM_NAV
+                    WindowWidthSizeClass.Medium -> NavigationType.NAV_RAIL
+                    WindowWidthSizeClass.Expanded -> NavigationType.NAV_RAIL
+                    else -> NavigationType.BOTTOM_NAV
+                }
                 EcommerceAppTheme(darkTheme = darkModeEnabled.value) {
                     EcommerceNavHost(
                         navController = navController,
+                        navigationType = navigationType,
                         isNotification = isNotification,
                         startDestination = startDestination,
                         isDarkMode = darkModeEnabled.value,

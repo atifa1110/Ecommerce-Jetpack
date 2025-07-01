@@ -1,5 +1,6 @@
 package com.example.ecommerceapp.screen.notification
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ecommerceapp.R
 import com.example.ecommerceapp.components.BackTopAppBar
@@ -21,6 +24,7 @@ import com.example.ecommerceapp.components.ErrorPage
 import com.example.ecommerceapp.components.LoaderScreen
 import com.example.ecommerceapp.components.NotificationListCard
 import com.example.core.ui.model.Notification
+import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 
 @Composable
 fun NotificationRoute(
@@ -61,7 +65,7 @@ fun NotificationScreen(
     ) {
        NotificationContent(
            isLoading = uiState.isLoading,
-            modifier = Modifier.padding(it),
+           modifier = Modifier.padding(it),
            notificationList = uiState.notifications,
            setNotificationRead = setNotificationRead
        )
@@ -102,5 +106,38 @@ fun NotificationContent(
             }
         }
     }
+}
 
+@Preview("Light Mode", device = Devices.PIXEL_3)
+@Preview("Dark Mode", device = Devices.PIXEL_3, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun NotificationPreview(){
+    EcommerceAppTheme {
+        NotificationScreen(
+            uiState = NotificationUiState(
+                isLoading = false,
+                isError = false,
+                notifications = listOf(
+                    Notification(
+                        1,"Telkomsel Award 2023",
+                        "Nikmati Kemeriahan ulang tahun Telkomsel pada har jumat 21 Juli 2023 pukul 19.00 - 21.00 WIB langsung dari Beach City International Stadium dengan berbagai kemudahan untuk mendapatkan aksesnya.",
+                        "",
+                        "Promo",
+                        "21 Jul 2023","12:34", false
+                    ),
+                    Notification(
+                        1,"Telkomsel Award 2023",
+                        "Nikmati Kemeriahan ulang tahun Telkomsel pada har jumat 21 Juli 2023 pukul 19.00 - 21.00 WIB langsung dari Beach City International Stadium dengan berbagai kemudahan untuk mendapatkan aksesnya.",
+                        "",
+                        "Promo",
+                        "21 Jul 2023","12:34", true
+                    )
+                )
+            ),
+            isNotification = "",
+            onNavigateBack = {},
+            onNavigateToMain = {},
+            setNotificationRead = {_,_ ->}
+        )
+    }
 }

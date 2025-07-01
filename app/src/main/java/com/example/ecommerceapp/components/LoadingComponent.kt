@@ -1,5 +1,6 @@
 package com.example.ecommerceapp.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.CircularProgressIndicator
@@ -13,7 +14,7 @@ import com.example.ecommerceapp.ui.theme.Purple
 @Composable
 fun LoaderScreen(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier,
+        modifier = modifier.background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

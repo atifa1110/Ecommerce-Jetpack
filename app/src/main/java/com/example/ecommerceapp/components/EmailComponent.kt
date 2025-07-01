@@ -50,8 +50,12 @@ fun EmailComponent(
             color = MaterialTheme.colorScheme.error
         )
     } else {
+        val contextText = stringResource(
+            id = R.string.email_hint_example,
+            if (email.isEmpty()) "test@gmail.com" else email
+        )
         TextFieldCorrect(
-            textError = if (email.isEmpty()) "Contoh: test@gmail.com" else "Contoh: $email",
+            textError = contextText,
             color = Color.Gray
         )
     }

@@ -131,7 +131,8 @@ fun SearchScreen(
 
                 errorMessage == null && search.isNotBlank() && uiState.isSuccess && uiState.suggestions.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Search is Empty")
+                        Text("Search is Empty",
+                            style = MaterialTheme.typography.bodyMedium)
                     }
                 }
 

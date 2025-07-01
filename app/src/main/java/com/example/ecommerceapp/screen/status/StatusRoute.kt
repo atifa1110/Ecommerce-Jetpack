@@ -54,6 +54,7 @@ import com.example.core.ui.model.Fulfillment
 import com.example.ecommerceapp.screen.shared.SharedViewModel
 import com.example.ecommerceapp.ui.theme.DarkPurple
 import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+import com.example.ecommerceapp.ui.theme.poppins
 import com.example.ecommerceapp.utils.currency
 import kotlinx.coroutines.flow.collectLatest
 
@@ -151,7 +152,7 @@ fun StatusScreen(
                         ) {
                             Text(
                                 text = stringResource(id = R.string.done),
-                                fontWeight = FontWeight.W500
+                                style = MaterialTheme.typography.labelLarge
                             )
                         }
                     }
@@ -204,7 +205,8 @@ fun StatusContent(
                                 text = stringResource(id = R.string.payment_success),
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 20.sp,
-                                fontWeight = FontWeight.W600
+                                fontWeight = FontWeight.W600,
+                                fontFamily = poppins
                             )
                         }
 
@@ -227,9 +229,10 @@ fun StatusContent(
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(id = R.string.leave_review),
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.W600
+                            fontWeight = FontWeight.W600,
+                            fontFamily = poppins
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         TextComponent(text = review, onTextChanged = onReviewChanged, label = R.string.leave_review)
                     }
@@ -260,7 +263,8 @@ fun StatusContent(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.detail_transaction),
                 fontSize = 14.sp,
-                fontWeight = FontWeight.W600
+                fontWeight = FontWeight.W600,
+                fontFamily = poppins
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -269,7 +273,8 @@ fun StatusContent(
                 Text(
                     text = stringResource(id = R.string.transaction_id),
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.W400
+                    fontWeight = FontWeight.W400,
+                    fontFamily = poppins
                 )
                 Row(
                     modifier = Modifier.weight(1f),
@@ -278,7 +283,8 @@ fun StatusContent(
                     Text(
                         text = fulfillment.invoiceId,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.W600
+                        fontWeight = FontWeight.W600,
+                        fontFamily = poppins
                     )
                 }
             }
@@ -289,13 +295,18 @@ fun StatusContent(
                 Text(
                     text = stringResource(id = R.string.status),
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.W400
+                    fontWeight = FontWeight.W400,
+                    fontFamily = poppins
                 )
                 Row(
                     modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text = stringResource(R.string.Success), fontSize = 12.sp, fontWeight = FontWeight.W600)
+                    Text(text = stringResource(R.string.Success),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.W600,
+                        fontFamily = poppins
+                    )
                 }
             }
 
@@ -305,7 +316,8 @@ fun StatusContent(
                 Text(
                     text = stringResource(id = R.string.date),
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.W400
+                    fontWeight = FontWeight.W400,
+                    fontFamily = poppins
                 )
                 Row(
                     modifier = Modifier.weight(1f),
@@ -314,7 +326,8 @@ fun StatusContent(
                     Text(
                         text =fulfillment.date,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.W600
+                        fontWeight = FontWeight.W600,
+                        fontFamily = poppins
                     )
                 }
             }
@@ -325,7 +338,8 @@ fun StatusContent(
                 Text(
                     text = stringResource(id = R.string.time),
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.W400
+                    fontWeight = FontWeight.W400,
+                    fontFamily = poppins
                 )
                 Row(
                     modifier = Modifier.weight(1f),
@@ -334,7 +348,8 @@ fun StatusContent(
                     Text(
                         text = fulfillment.time,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.W600
+                        fontWeight = FontWeight.W600,
+                        fontFamily = poppins
                     )
                 }
             }
@@ -345,7 +360,8 @@ fun StatusContent(
                 Text(
                     text = stringResource(id = R.string.payment_method),
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.W400
+                    fontWeight = FontWeight.W400,
+                    fontFamily = poppins
                 )
                 Row(
                     modifier = Modifier.weight(1f),
@@ -354,7 +370,8 @@ fun StatusContent(
                     Text(
                         text = fulfillment.payment,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.W600
+                        fontWeight = FontWeight.W600,
+                        fontFamily = poppins
                     )
                 }
             }
@@ -365,7 +382,8 @@ fun StatusContent(
                 Text(
                     text = stringResource(id = R.string.total_payment),
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.W400
+                    fontWeight = FontWeight.W400,
+                    fontFamily = poppins
                 )
                 Row(
                     modifier = Modifier.weight(1f),
@@ -374,7 +392,8 @@ fun StatusContent(
                     Text(
                         text = currency(fulfillment.total),
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.W600
+                        fontWeight = FontWeight.W600,
+                        fontFamily = poppins
                     )
                 }
             }

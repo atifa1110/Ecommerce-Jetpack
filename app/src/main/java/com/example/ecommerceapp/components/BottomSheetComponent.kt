@@ -1,5 +1,6 @@
 package com.example.ecommerceapp.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -15,17 +16,25 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ecommerceapp.R
+import com.example.ecommerceapp.screen.login.LoginScreen
+import com.example.ecommerceapp.screen.login.LoginUiState
+import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
+import com.example.ecommerceapp.ui.theme.poppins
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -69,8 +78,7 @@ fun BottomSheetFilter(
                     ) {
                         Text(
                             text = stringResource(id = R.string.filter),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.W700
+                            style = MaterialTheme.typography.titleSmall
                         )
                     }
                     Column(
@@ -83,7 +91,7 @@ fun BottomSheetFilter(
                         }) {
                             Text(
                                 text = stringResource(id = R.string.reset),
-                                fontSize = 14.sp,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -93,7 +101,8 @@ fun BottomSheetFilter(
                 Text(
                     text = stringResource(id = R.string.sort),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.W600
+                    fontWeight = FontWeight.W600,
+                    fontFamily = poppins
                 )
                 FlowRow(modifier = Modifier.fillMaxWidth()) {
                     sortItems.forEach { item ->
@@ -102,7 +111,8 @@ fun BottomSheetFilter(
                             selected = (selectedSort == item),
                             onClick = { updateSelectedSort(item) },
                             label = {
-                                Text(text = item)
+                                Text(text = item,
+                                    style= MaterialTheme.typography.bodyMedium)
                             }
                         )
                     }
@@ -112,7 +122,8 @@ fun BottomSheetFilter(
                 Text(
                     stringResource(id = R.string.category),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.W600
+                    fontWeight = FontWeight.W600,
+                    fontFamily = poppins
                 )
                 LazyRow(modifier = Modifier.fillMaxWidth()) {
                     items(categoryItems) { item ->
@@ -130,7 +141,8 @@ fun BottomSheetFilter(
                 Text(
                     stringResource(id = R.string.price),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.W600
+                    fontWeight = FontWeight.W600,
+                    fontFamily = poppins
                 )
                 Row(
                     modifier = Modifier
@@ -162,5 +174,29 @@ fun BottomSheetFilter(
                 )
             }
         }
+    }
+}
+
+@Preview("Light Mode", device = Devices.PIXEL_3)
+@Preview("Dark Mode", device = Devices.PIXEL_3, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun BottomSheetPreview() {
+    EcommerceAppTheme {
+        BottomSheetFilter(
+            selectedSort = "sort",
+            selectedBrand = "brand",
+            lowestPrice = "0",
+            highestPrice = "100",
+            categoryItems = arrayOf("brand", "brand1", "brand4"),
+            sortItems = arrayOf("sort" ,"sort1", "sort2"),
+            isBottomSheetOpen = false,
+            setBottomSheetOpen = {},
+            updatePriceLowest = {},
+            updatePriceHighest = {},
+            updateSelectedSort = {},
+            updateSelectedBrand = {},
+            onResetQuery = {},
+            onSetQuery = {_,_,_,_->}
+        )
     }
 }

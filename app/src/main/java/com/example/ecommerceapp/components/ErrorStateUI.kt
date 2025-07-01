@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.data.network.response.PagingError
 import com.example.ecommerceapp.R
+import com.example.ecommerceapp.ui.theme.poppins
 
 data class ErrorUI(
     val title: String,
@@ -112,11 +113,14 @@ fun ErrorPage(
             modifier = Modifier.padding(top = 16.dp),
             text = title,
             fontSize = 32.sp,
-            fontWeight = FontWeight.W500
+            fontWeight = FontWeight.W500,
+            fontFamily = poppins
         )
-        Text(modifier = Modifier.padding(top = 8.dp),
-            text = message, fontSize = 16.sp,
-            fontWeight = FontWeight.W400)
+        Text(
+            modifier = Modifier.padding(top = 8.dp),
+            text = message,
+            style = MaterialTheme.typography.bodyLarge
+        )
         Button(
             modifier = Modifier
                 .padding(top = 8.dp)
@@ -129,7 +133,7 @@ fun ErrorPage(
         ) {
             Text(
                 text = button,
-                fontWeight = FontWeight.W500
+                style = MaterialTheme.typography.labelLarge
             )
         }
     }

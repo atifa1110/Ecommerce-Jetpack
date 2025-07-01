@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.ecommerceapp.screen.main.MainRoute
+import com.example.ecommerceapp.screen.main.NavigationType
 
 object MainDestination : EcommerceNavigationDestination {
     override val route: String = "main_route"
@@ -21,6 +22,7 @@ object MainDestination : EcommerceNavigationDestination {
 }
 
 fun NavGraphBuilder.mainGraph(
+    navigationType: NavigationType,
     isDarkMode: Boolean,
     onNavigateToLogin : () -> Unit,
     onToggleTheme : (Boolean) -> Unit,
@@ -43,6 +45,7 @@ fun NavGraphBuilder.mainGraph(
     MainRoute(
         startTab = startTab,
         isDarkMode = isDarkMode,
+        navigationType = navigationType,
         onNavigateToLogin = onNavigateToLogin,
         onNavigateToDetail = onNavigateToDetail,
         onNavigateToCart = onNavigateToCart,

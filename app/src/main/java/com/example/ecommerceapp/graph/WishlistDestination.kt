@@ -2,6 +2,7 @@ package com.example.ecommerceapp.graph
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.example.ecommerceapp.screen.main.NavigationType
 import com.example.ecommerceapp.screen.wishlist.WishlistRoute
 
 object WishlistDestination : EcommerceNavigationDestination {
@@ -10,6 +11,9 @@ object WishlistDestination : EcommerceNavigationDestination {
 }
 
 fun NavGraphBuilder.wishlistGraph(
+    navigationType: NavigationType
 ) = composable(route = WishlistDestination.route) {
-    WishlistRoute()
+    WishlistRoute(
+        navigationType = navigationType
+    )
 }

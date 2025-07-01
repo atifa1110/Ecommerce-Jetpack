@@ -7,6 +7,7 @@
     <string name="login">Masuk</string>
     <string name="email">Email</string>
     <string name="email_invalid">Email tidak valid</string>
+    <string name="email_hint_example">Contoh: %1$s</string>
     <string name="password">Kata Sandi</string>
     <string name="password_invalid">Kata sandi tidak valid</string>
     <string name="password_min">Minimal 8 karakter</string>
@@ -52,7 +53,7 @@
     <string name="category">Kategori</string>
     <string name="price">Harga</string>
     <string name="apply">Terapkan</string>
-    <string name="detail">Detail</string>
+    <string name="detail">Detail Product</string>
     <string name="buy_now">Beli Sekarang</string>
     <string name="cart">Keranjang</string>
     <string name="choose_variant">Pilih Varian</string>

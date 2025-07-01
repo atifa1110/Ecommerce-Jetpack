@@ -35,6 +35,7 @@ import com.example.ecommerceapp.ui.theme.EcommerceAppTheme
 fun MainRoute(
     startTab: String?,
     isDarkMode: Boolean,
+    navigationType: NavigationType,
     onNavigateToLogin : () -> Unit,
     onNavigateToDetail: (String) -> Unit,
     onNavigateToCart:() -> Unit,
@@ -67,7 +68,7 @@ fun MainRoute(
         onNavigateToNotification = onNavigateToNotification,
         onNavigateToModular = onNavigateToModular,
         onToggleTheme = onToggleTheme,
-        navigationType = NavigationType.BOTTOM_NAV
+        navigationType = navigationType
     )
 }
 
@@ -94,10 +95,9 @@ fun MainScreen(
     val currentDestination = navBackStackEntry?.destination
     val topLevelDestinations = MainLevelDestination.entries.toTypedArray()
     val startDestination = startTab ?: MainLevelDestination.Home.route
-    val useRail = navigationType == NavigationType.NAV_RAIL
 
     MainScaffoldLayout(
-        useRail = useRail,
+        navigationType = navigationType,
         items = topLevelDestinations,
         startDestination = startDestination,
         currentDestination = currentDestination,
@@ -120,7 +120,7 @@ fun MainScreen(
 
 @Composable
 fun MainScaffoldLayout(
-    useRail: Boolean,
+    navigationType : NavigationType,
     items: Array<MainLevelDestination>,
     currentDestination: NavDestination?,
     startDestination : String,
@@ -139,6 +139,8 @@ fun MainScaffoldLayout(
     onNavigateToModular: () -> Unit,
     onToggleTheme : (Boolean) -> Unit,
 ) {
+    val useRail = navigationType == NavigationType.NAV_RAIL
+
     Row (modifier = Modifier.fillMaxSize()) {
         if (useRail) {
             NavigationSideBar(
@@ -176,6 +178,7 @@ fun MainScaffoldLayout(
             Column(modifier = Modifier.fillMaxSize().padding(it)
             ) {
                 BottomNavHost(
+                    navigationType = navigationType,
                     navController = navController,
                     startDestination = startDestination,
                     isDarkMode = isDarkMode,
