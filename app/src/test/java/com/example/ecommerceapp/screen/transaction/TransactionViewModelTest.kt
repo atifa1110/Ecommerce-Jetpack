@@ -138,5 +138,4 @@ class TransactionViewModelTest {
 
         coVerify { statusAnalytics.trackReviewButtonClicked() }
     }
-
 }

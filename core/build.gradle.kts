@@ -7,6 +7,12 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     jacoco
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
 }
 
 val localProperties = Properties().apply {
@@ -166,6 +172,9 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging)
+
+    //detekt
+    detektPlugins(libs.detekt.formatting)
 
     //test
     testImplementation(libs.truth)

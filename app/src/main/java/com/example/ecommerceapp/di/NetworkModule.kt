@@ -101,5 +101,4 @@ object NetworkModule {
     fun provideFirebaseService(retrofit: Retrofit): FirebaseApiService {
         return retrofit.create(FirebaseApiService::class.java)
     }
-
 }

@@ -9,6 +9,24 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     jacoco
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+    autoCorrect = false
+}
+
+tasks.register<io.gitlab.arturbosch.detekt.Detekt>("detektFormat") {
+    description = "Runs detekt with auto-formatting"
+    parallel = true
+    autoCorrect = true
+    setSource(files("app/src", "core/src", "screen/src"))
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    include("**/*.kt", "**/*.kts")
+    exclude("**/build/**")
+    buildUponDefaultConfig = true
 }
 
 val localProperties = Properties().apply {
@@ -210,10 +228,6 @@ dependencies {
     //foundation
     implementation(libs.androidx.foundation)
 
-    //accompanist
-    implementation(libs.accompanist.pager)
-    implementation(libs.accompanist.pager.indicators)
-
     //icon extended
     implementation(libs.androidx.material.icons.extended)
 
@@ -267,6 +281,9 @@ dependencies {
 
     //window size
     implementation(libs.material3.window.size)
+
+    //detekt
+    detektPlugins(libs.detekt.formatting)
 
     //test
     testImplementation(libs.truth)

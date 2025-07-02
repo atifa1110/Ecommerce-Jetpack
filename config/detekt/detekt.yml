@@ -1,0 +1,90 @@
+build:
+  maxIssues: 10
+  excludeCorrectable: false
+
+config:
+  validation: true
+
+processors:
+  active: true
+  exclude:
+    - 'FunctionCountProcessor'
+    - 'PropertyCountProcessor'
+
+comments:
+  UndocumentedPublicClass:
+    active: true
+    excludes:
+      - '**/BuildConfig.*'
+      - '**/di/**'
+      - '**/*Preview*'
+  UndocumentedPublicFunction:
+    active: false  # Optional: Banyak @Composable tidak butuh dokumentasi
+
+complexity:
+  LongMethod:
+    active: false  # Banyak fungsi Composable panjang
+  LargeClass:
+    active: true
+    threshold: 600
+  ComplexCondition:
+    active: true
+
+empty-blocks:
+  EmptyFunctionBlock:
+    active: false
+  EmptyClassBlock:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - Exception
+      - Throwable
+
+formatting:
+  active: true
+  android: true
+  autoCorrect: true
+
+  Indentation:
+    active: false
+
+  MaximumLineLength:
+    active: true
+    maxLineLength: 140
+
+  Wrapping:
+    active: true
+
+naming:
+  FunctionNaming:
+    active: true
+    functionPattern: '^[a-z][A-Za-z0-9]*$'
+    excludeClassPattern: '.*Preview.*'
+    ignoreAnnotated:
+      - Composable
+
+performance:
+  SpreadOperator:
+    active: false  # Tidak terlalu kritis di Compose
+
+style:
+  MagicNumber:
+    active: true
+    ignoreNumbers: ["-1", "0", "1", "2"]
+    ignorePropertyDeclaration: true
+    ignoreAnnotation: true
+    ignoreEnums: true
+    ignoreNamedArgument: true  # Penting untuk Compose
+
+  WildcardImport:
+    active: false
+
+  RedundantVisibilityModifierRule:
+    active: true
+
+potential-bugs:
+  UnnecessarySafeCall:
+    active: true

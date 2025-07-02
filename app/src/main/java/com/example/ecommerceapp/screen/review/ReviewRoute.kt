@@ -84,7 +84,7 @@ fun ReviewContent(
                     title = stringResource(id = R.string.empty),
                     message = stringResource(id = R.string.resource),
                     button = stringResource(R.string.refresh),
-                    onButtonClick = {},
+                    onClick = {},
                     0F
                 )
             }

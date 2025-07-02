@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,9 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import com.example.ecommerceapp.R
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
+import com.example.ecommerceapp.components.DotIndicatorWithScaling
 
 @Composable
 fun OnBoardingRoute(
@@ -58,7 +59,7 @@ fun OnBoardingScreen (
     onNavigateToRegister: () -> Unit
 ){
     val pages = listOf(OnBoardingPage.First, OnBoardingPage.Second, OnBoardingPage.Third)
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(initialPage = 0) { pages.size }
     val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier
@@ -69,7 +70,6 @@ fun OnBoardingScreen (
     ) {
         HorizontalPager(
             modifier = Modifier.weight(1f),
-            count = 3,
             state = pagerState,
             verticalAlignment = Alignment.CenterVertically
         ) { position ->
@@ -120,7 +120,12 @@ fun OnBoardingScreen (
                 Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                HorizontalPagerIndicator(modifier = Modifier.padding(5.dp), pagerState = pagerState)
+                DotIndicatorWithScaling(
+                    pagerState = pagerState,
+                    totalDots = pages.size,
+                    selectedColor = MaterialTheme.colorScheme.primary,
+                    unselectedColor = LightGray
+                )
             }
             // column button next
             Column(

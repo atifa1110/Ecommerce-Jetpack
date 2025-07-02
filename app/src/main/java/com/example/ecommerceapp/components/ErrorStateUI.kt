@@ -30,6 +30,12 @@ data class ErrorUI(
     val onClick: () -> Unit
 )
 
+object HttpStatus {
+    const val UNAUTHORIZED = 401
+    const val NOT_FOUND = 404
+    const val INTERNAL_SERVER_ERROR = 500
+}
+
 @Composable
 fun ErrorStateUI(
     error: Throwable,
@@ -39,7 +45,7 @@ fun ErrorStateUI(
 ) {
     val (title, message, buttonRes,onClick) = when (error) {
         is PagingError.ApiError -> when (error.code) {
-            404 -> ErrorUI(
+            HttpStatus.NOT_FOUND -> ErrorUI(
                 title = stringResource(id = R.string.empty),
                 message = stringResource(id = R.string.resource),
                 buttonRes = stringResource(id = R.string.reset),
@@ -48,13 +54,13 @@ fun ErrorStateUI(
                     onRefreshAnalytics()
                 }
             )
-            500 -> ErrorUI(
+            HttpStatus.INTERNAL_SERVER_ERROR -> ErrorUI(
                 title = error.code.toString(),
                 message = stringResource(id = R.string.internal),
                 buttonRes = stringResource(id = R.string.refresh),
                 onClick = { onResetQuery(); onRefreshAnalytics() }
             )
-            401 -> ErrorUI(
+            HttpStatus.UNAUTHORIZED -> ErrorUI(
                 title = stringResource(id = R.string.connection),
                 message = stringResource(id = R.string.connection_unavailable),
                 buttonRes = stringResource(id = R.string.refresh),
@@ -86,7 +92,7 @@ fun ErrorStateUI(
         title = title,
         message = message,
         button = buttonRes,
-        onButtonClick = onClick,
+        onClick = onClick,
         alpha = 1f
     )
 }
@@ -96,7 +102,7 @@ fun ErrorPage(
     title: String,
     message: String,
     button: String,
-    onButtonClick: () -> Unit,
+    onClick: () -> Unit,
     alpha: Float
 ) {
     Column(
@@ -125,7 +131,7 @@ fun ErrorPage(
             modifier = Modifier
                 .padding(top = 8.dp)
                 .alpha(alpha),
-            onClick = { onButtonClick() },
+            onClick = { onClick() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary

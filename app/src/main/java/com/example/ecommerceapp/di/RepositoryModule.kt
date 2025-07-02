@@ -42,31 +42,25 @@ abstract class RepositoryModule {
     @Binds
     abstract fun bindPaymentRepository(repository: PaymentRepositoryImpl): PaymentRepository
 
-
     @Singleton
     @Binds
     abstract fun bindCartRepository(repository: CartRepositoryImpl): CartRepository
-
 
     @Singleton
     @Binds
     abstract fun bindWishlistRepository(repository: WishlistRepositoryImpl): WishlistRepository
 
-
     @Singleton
     @Binds
     abstract fun bindProductRepository(repository: ProductRepositoryImpl): ProductRepository
-
 
     @Singleton
     @Binds
     abstract fun bindUserRepository(repository: UserRepositoryImpl): UserRepository
 
-
     @Singleton
     @Binds
     abstract fun bindStateRepository(repository: StateRepositoryImpl): StateRepository
-
 
     @Singleton
     @Binds

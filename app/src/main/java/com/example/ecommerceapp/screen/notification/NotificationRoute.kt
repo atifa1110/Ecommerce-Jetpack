@@ -90,7 +90,7 @@ fun NotificationContent(
                 title = stringResource(id = R.string.empty),
                 message = stringResource(id = R.string.resource),
                 button = stringResource(R.string.refresh),
-                onButtonClick = { /*TODO*/ },
+                onClick = { /*TODO*/ },
                 alpha = 0f
             )
         } else {
@@ -120,14 +120,14 @@ fun NotificationPreview(){
                 notifications = listOf(
                     Notification(
                         1,"Telkomsel Award 2023",
-                        "Nikmati Kemeriahan ulang tahun Telkomsel pada har jumat 21 Juli 2023 pukul 19.00 - 21.00 WIB langsung dari Beach City International Stadium dengan berbagai kemudahan untuk mendapatkan aksesnya.",
+                        "Nikmati Kemeriahan ulang tahun Telkomsel",
                         "",
                         "Promo",
                         "21 Jul 2023","12:34", false
                     ),
                     Notification(
                         1,"Telkomsel Award 2023",
-                        "Nikmati Kemeriahan ulang tahun Telkomsel pada har jumat 21 Juli 2023 pukul 19.00 - 21.00 WIB langsung dari Beach City International Stadium dengan berbagai kemudahan untuk mendapatkan aksesnya.",
+                        "Nikmati Kemeriahan ulang tahun Telkomsel",
                         "",
                         "Promo",
                         "21 Jul 2023","12:34", true

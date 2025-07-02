@@ -74,7 +74,7 @@ fun TransactionScreen(
                     title = stringResource(id = R.string.empty),
                     message = stringResource(id = R.string.resource),
                     button = stringResource(R.string.refresh),
-                    onButtonClick = { },
+                    onClick = { },
                     alpha = 0F
                 )
             }
@@ -84,7 +84,7 @@ fun TransactionScreen(
                     title = stringResource(id = R.string.empty),
                     message = stringResource(id = R.string.resource),
                     button = stringResource(R.string.refresh),
-                    onButtonClick = { },
+                    onClick = { },
                     alpha = 0F
                 )
             }

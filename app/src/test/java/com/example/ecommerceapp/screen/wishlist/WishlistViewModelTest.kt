@@ -234,5 +234,4 @@ class WishlistViewModelTest {
         // Assert - analytics tracked
         coVerify { wishlistAnalytics.trackGridView(true) }
     }
-
 }

@@ -8,6 +8,9 @@ Tokopaerbe is an e-commerce application that sells a variety of electronic produ
 
 ## Features
 
+- Adaptive layout based on screen size (Phone vs Tablet) using Material 3 Window Size Classes
+   - Bottom navigation for phones
+   - Navigation rail for tablets
 - User authentication and Google OAuth integration
 - Product browsing, cart, and checkout flow
 - Payment method selection and integration
@@ -28,22 +31,23 @@ Tokopaerbe is an e-commerce application that sells a variety of electronic produ
 
 ## Technology Stack
 
-| Category                  | Technology / Library              |
-|---------------------------|---------------------------------|
-| Language                  | Kotlin                          |
-| UI                        | Material 3         |
-| Concurrency & Reactive    | Kotlin Coroutines, LiveData, Flow |
-| Dependency Injection      | Hilt, Manual DI   |
-| Image Loading             | Glide, Coil                    |
-| JSON Parsing              | Gson, Moshi                   |
-| Data Storage              | SharedPreferences, DataStore     |
-| Build System              | Gradle Groovy, Kotlin DSL, buildSrc, build-logic |
-| Architecture             | Single Activity, MVVM, Clean Architecture     |
-| Local Database            | Room                            |
-| Network                   | Retrofit, Chucker               |
+| Category                  | Technology / Library                                                   |
+|---------------------------|------------------------------------------------------------------------|
+| Language                  | Kotlin                                                                 |
+| UI                        | Material 3 + Jetpack Compose                                           |
+| Responsive Layout         | Window Size Classes                                                    |
+| Concurrency & Reactive    | Kotlin Coroutines, LiveData, Flow                                      |
+| Dependency Injection      | Hilt, Manual DI                                                        |
+| Image Loading             | Glide, Coil                                                            |
+| JSON Parsing              | Gson                                                                   |
+| Data Storage              | SharedPreferences, DataStore                                           |
+| Build System              | Gradle Kotlin DSL + Version Catalog                                    |
+| Architecture              | Single Activity, MVVM, Clean Architecture                              |
+| Local Database            | Room                                                                   |
+| Network                   | Retrofit, Chucker                                                      |
 | Firebase Services         | Authentication, Remote Config, Cloud Messaging, Crashlytics, Analytics |
-| Testing                   | Unit Testing                   |
-| Code Quality              | Detekt, Proguard               |
+| Testing                   | JUnit, Mockito, MockK, Robolectric                                     |
+| Code Quality              | Detekt, Proguard                                                       |
 
 ---
 
@@ -72,12 +76,14 @@ The app follows **Clean Architecture** principles divided into layers:
 
 ## Usage
 
-- The app uses **Firebase Remote Config** for payment method configuration and feature flags
-- Network requests are handled with Retrofit and responses cached locally with Room
-- User interactions follow the MVVM pattern with reactive updates via Flow and LiveData
-- Push notifications are enabled and handled via Firebase Cloud Messaging
-- Crash reports and analytics events are tracked using Firebase Crashlytics and Analytics
-
+- Adaptive layout: Uses `WindowSizeClass` to adapt UI based on screen width
+   - Displays bottom navigation on phones
+   - Uses navigation rail on tablets
+- Firebase Remote Config is used for controlling payment methods and feature toggles
+- Retrofit is used for all API calls with Chucker for debugging
+- ViewModel with Flow and LiveData handles UI reactivity
+- Push notifications are managed via FCM
+- Crashlytics and Analytics log errors and user behavior
 ---
 
 ## Notes
@@ -86,6 +92,17 @@ The app follows **Clean Architecture** principles divided into layers:
 - In production, a fetch interval of `3600` seconds (1 hour) is used to optimize network usage
 - The app supports modularization for scalability; modules can be found under `/modules` (optional)
 - Code quality and obfuscation is ensured using Detekt and Proguard
+
+---
+
+## Code Quality
+
+- Static code analysis is enforced using [Detekt](https://github.com/detekt/detekt)
+   - Configured using `config/detekt/detekt.yml`
+   - Runs via Gradle task: `./gradlew detekt`
+   - Custom rules adapted for Jetpack Compose and Clean Architecture
+   - Formatting enforced via `detekt-formatting` (based on ktlint)
+- Obfuscation and optimization enabled via Proguard
 
 ---
 
