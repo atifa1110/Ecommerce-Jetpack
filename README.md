@@ -4,7 +4,12 @@
 
 Tokopaerbe is an e-commerce application that sells a variety of electronic products, featuring functionalities such as pre-login, store browsing, order fulfillment, shopping cart, wishlist, product details, and Firebase integration 
 
----
+## Preview
+<img width="145" height="298" alt="Image" src="https://github.com/user-attachments/assets/1757ccf2-4465-493e-a3f2-cfcf2392fe7d" />
+<img width="143" height="299" alt="Image" src="https://github.com/user-attachments/assets/1400a1d6-7c66-494b-8dc7-fc945a6c2a57" />
+<img width="146" height="301" alt="Image" src="https://github.com/user-attachments/assets/4d0f6e3d-6f2b-4e10-80a9-d53d36b6a9f6" />
+<img width="146" height="299" alt="Image" src="https://github.com/user-attachments/assets/ee7596e7-b772-4569-a14c-6c00435a295f" />
+<img width="146" height="299" alt="Image" src="https://github.com/user-attachments/assets/d200577b-9057-4961-b589-1abeb16b5252" />
 
 ## Features
 
